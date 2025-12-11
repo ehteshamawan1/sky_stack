@@ -69,8 +69,10 @@ app.*.map.json
 *.freezed.dart
 *.mocks.dart
 
-# Firebase config (keep google-services.json in android/app/ but not GoogleService-Info.plist)
-# google-services.json is needed for Android builds
+# Firebase config files (contain API keys - NEVER commit)
+**/google-services.json
+**/GoogleService-Info.plist
+firebase_options.dart
 
 # Environment files
 .env
