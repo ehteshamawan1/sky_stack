@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+  <defs>
+    <linearGradient id="building1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2c3e50;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#1a252f;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  <!-- Far buildings silhouette -->
+  <rect x="0" y="120" width="30" height="80" fill="url(#building1)"/>
+  <rect x="35" y="100" width="25" height="100" fill="url(#building1)"/>
+  <rect x="65" y="130" width="35" height="70" fill="url(#building1)"/>
+  <rect x="105" y="90" width="20" height="110" fill="url(#building1)"/>
+  <rect x="130" y="110" width="40" height="90" fill="url(#building1)"/>
+  <rect x="175" y="80" width="25" height="120" fill="url(#building1)"/>
+  <rect x="205" y="120" width="30" height="80" fill="url(#building1)"/>
+  <rect x="240" y="95" width="35" height="105" fill="url(#building1)"/>
+  <rect x="280" y="115" width="25" height="85" fill="url(#building1)"/>
+  <rect x="310" y="85" width="30" height="115" fill="url(#building1)"/>
+  <rect x="345" y="105" width="25" height="95" fill="url(#building1)"/>
+  <rect x="375" y="125" width="25" height="75" fill="url(#building1)"/>
+</svg>
