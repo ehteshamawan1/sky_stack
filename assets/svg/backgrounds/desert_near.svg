@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Foreground dunes -->
+  <g fill="#D4915C">
+    <ellipse cx="-50" cy="750" rx="150" ry="80"/>
+    <ellipse cx="450" cy="740" rx="140" ry="90"/>
+  </g>
+  <!-- Large cactus on left -->
+  <g fill="#2E7D32">
+    <ellipse cx="30" cy="650" rx="12" ry="60"/>
+    <ellipse cx="20" cy="620" rx="8" ry="25" transform="rotate(-40 20 620)"/>
+    <ellipse cx="40" cy="610" rx="8" ry="30" transform="rotate(35 40 610)"/>
+  </g>
+  <!-- Palm tree on right -->
+  <rect x="355" y="580" width="8" height="120" fill="#8B4513"/>
+  <g fill="#228B22">
+    <ellipse cx="359" cy="575" rx="25" ry="12" transform="rotate(-20 359 575)"/>
+    <ellipse cx="359" cy="570" rx="25" ry="10" transform="rotate(20 359 570)"/>
+    <ellipse cx="359" cy="565" rx="22" ry="8" transform="rotate(-10 359 565)"/>
+    <ellipse cx="359" cy="580" rx="20" ry="10" transform="rotate(40 359 580)"/>
+    <ellipse cx="359" cy="578" rx="20" ry="10" transform="rotate(-40 359 578)"/>
+  </g>
+  <!-- Ground/Sand -->
+  <rect x="0" y="720" width="400" height="80" fill="#C9A66B"/>
+  <!-- Sand texture dots -->
+  <g fill="#B8956B" opacity="0.5">
+    <circle cx="50" cy="740" r="2"/>
+    <circle cx="120" cy="750" r="1.5"/>
+    <circle cx="200" cy="735" r="2"/>
+    <circle cx="280" cy="755" r="1.5"/>
+    <circle cx="350" cy="742" r="2"/>
+  </g>
+  <!-- Small rocks -->
+  <ellipse cx="100" cy="760" rx="8" ry="4" fill="#A0522D"/>
+  <ellipse cx="300" cy="750" rx="6" ry="3" fill="#8B4513"/>
+</svg>

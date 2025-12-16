@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80">
+  <defs>
+    <linearGradient id="parachuteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF5722"/>
+      <stop offset="100%" style="stop-color:#E64A19"/>
+    </linearGradient>
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ECEFF1"/>
+      <stop offset="100%" style="stop-color:#B0BEC5"/>
+    </linearGradient>
+  </defs>
+  <!-- Space parachute/drag chute -->
+  <ellipse cx="30" cy="12" rx="24" ry="10" fill="url(#parachuteGrad)"/>
+  <line x1="8" y1="15" x2="22" y2="38" stroke="#BF360C" stroke-width="1"/>
+  <line x1="52" y1="15" x2="38" y2="38" stroke="#BF360C" stroke-width="1"/>
+  <line x1="30" y1="20" x2="30" y2="38" stroke="#BF360C" stroke-width="1"/>
+  <!-- Space suit body -->
+  <ellipse cx="30" cy="55" rx="12" ry="14" fill="url(#suitGrad)"/>
+  <!-- Helmet -->
+  <circle cx="30" cy="42" r="10" fill="#37474F"/>
+  <!-- Visor -->
+  <ellipse cx="30" cy="43" rx="7" ry="6" fill="#4FC3F7"/>
+  <ellipse cx="26" cy="41" rx="3" ry="2" fill="white" opacity="0.4"/>
+  <!-- Face behind visor -->
+  <circle cx="30" cy="44" r="5" fill="#FFCC80"/>
+  <circle cx="28" cy="43" r="1" fill="#333"/>
+  <circle cx="32" cy="43" r="1" fill="#333"/>
+  <path d="M28,46 Q30,48 32,46" fill="none" stroke="#333" stroke-width="0.8"/>
+  <!-- Jetpack -->
+  <rect x="38" y="48" width="8" height="14" rx="2" fill="#455A64"/>
+  <circle cx="42" cy="65" r="3" fill="#FF5722"/>
+  <circle cx="42" cy="65" r="1.5" fill="#FFEB3B"/>
+  <!-- Suit details -->
+  <circle cx="22" cy="52" r="2" fill="#78909C"/>
+  <circle cx="38" cy="52" r="2" fill="#78909C"/>
+  <rect x="26" y="58" width="8" height="4" rx="1" fill="#2196F3"/>
+  <!-- Boots -->
+  <ellipse cx="24" cy="72" rx="5" ry="6" fill="#455A64"/>
+  <ellipse cx="36" cy="72" rx="5" ry="6" fill="#455A64"/>
+</svg>

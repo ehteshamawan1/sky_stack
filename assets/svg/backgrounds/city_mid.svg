@@ -1,36 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
-  <defs>
-    <linearGradient id="building2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#34495e;stop-opacity:0.8" />
-      <stop offset="100%" style="stop-color:#2c3e50;stop-opacity:0.8" />
-    </linearGradient>
-  </defs>
-  <!-- Mid-distance buildings with windows -->
-  <g fill="url(#building2)">
-    <rect x="10" y="80" width="45" height="120"/>
-    <rect x="60" y="60" width="35" height="140"/>
-    <rect x="100" y="90" width="50" height="110"/>
-    <rect x="155" y="50" width="40" height="150"/>
-    <rect x="200" y="70" width="45" height="130"/>
-    <rect x="250" y="85" width="35" height="115"/>
-    <rect x="290" y="55" width="50" height="145"/>
-    <rect x="345" y="75" width="40" height="125"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Medium distance buildings -->
+  <g fill="#2d2d5a">
+    <rect x="0" y="480" width="50" height="320"/>
+    <rect x="45" y="450" width="40" height="350"/>
+    <rect x="80" y="500" width="35" height="300"/>
+    <rect x="110" y="420" width="55" height="380"/>
+    <rect x="160" y="470" width="30" height="330"/>
+    <rect x="185" y="440" width="45" height="360"/>
+    <rect x="225" y="490" width="35" height="310"/>
+    <rect x="255" y="400" width="60" height="400"/>
+    <rect x="310" y="460" width="40" height="340"/>
+    <rect x="345" y="430" width="55" height="370"/>
   </g>
-  <!-- Windows -->
-  <g fill="rgba(255,220,100,0.6)">
-    <rect x="18" y="90" width="6" height="8"/>
-    <rect x="30" y="90" width="6" height="8"/>
-    <rect x="42" y="90" width="6" height="8"/>
-    <rect x="18" y="110" width="6" height="8"/>
-    <rect x="42" y="130" width="6" height="8"/>
-    <rect x="68" y="70" width="6" height="8"/>
-    <rect x="80" y="90" width="6" height="8"/>
-    <rect x="68" y="110" width="6" height="8"/>
-    <rect x="163" y="60" width="6" height="8"/>
-    <rect x="175" y="80" width="6" height="8"/>
-    <rect x="163" y="100" width="6" height="8"/>
-    <rect x="298" y="65" width="6" height="8"/>
-    <rect x="318" y="85" width="6" height="8"/>
-    <rect x="298" y="105" width="6" height="8"/>
+  <!-- Building details - windows -->
+  <g fill="#FFE082" opacity="0.5">
+    <!-- Building 1 windows -->
+    <rect x="10" y="500" width="8" height="10"/>
+    <rect x="25" y="500" width="8" height="10"/>
+    <rect x="10" y="520" width="8" height="10"/>
+    <rect x="25" y="520" width="8" height="10"/>
+    <rect x="10" y="540" width="8" height="10"/>
+    <rect x="25" y="540" width="8" height="10"/>
+    <!-- Building 2 windows -->
+    <rect x="55" y="470" width="8" height="10"/>
+    <rect x="68" y="470" width="8" height="10"/>
+    <rect x="55" y="490" width="8" height="10"/>
+    <rect x="68" y="490" width="8" height="10"/>
+    <!-- Building 3 windows -->
+    <rect x="120" y="440" width="10" height="12"/>
+    <rect x="140" y="440" width="10" height="12"/>
+    <rect x="120" y="460" width="10" height="12"/>
+    <rect x="140" y="460" width="10" height="12"/>
+    <rect x="120" y="480" width="10" height="12"/>
+    <rect x="140" y="480" width="10" height="12"/>
+    <!-- Building 4 windows -->
+    <rect x="265" y="420" width="10" height="12"/>
+    <rect x="285" y="420" width="10" height="12"/>
+    <rect x="300" y="420" width="10" height="12"/>
+    <rect x="265" y="440" width="10" height="12"/>
+    <rect x="285" y="440" width="10" height="12"/>
+    <rect x="300" y="440" width="10" height="12"/>
+    <!-- Building 5 windows -->
+    <rect x="355" y="450" width="10" height="12"/>
+    <rect x="375" y="450" width="10" height="12"/>
+    <rect x="355" y="470" width="10" height="12"/>
+    <rect x="375" y="470" width="10" height="12"/>
   </g>
+  <!-- Antenna/Spire details -->
+  <rect x="130" y="400" width="4" height="20" fill="#2d2d5a"/>
+  <rect x="280" y="380" width="5" height="20" fill="#2d2d5a"/>
+  <circle cx="282" cy="378" r="3" fill="#FF5722"/>
 </svg>

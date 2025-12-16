@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+  <defs>
+    <linearGradient id="personGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#64B5F6"/>
+      <stop offset="100%" style="stop-color:#1976D2"/>
+    </linearGradient>
+  </defs>
+  <!-- Head -->
+  <circle cx="25" cy="14" r="10" fill="#FFCC80"/>
+  <!-- Body -->
+  <ellipse cx="25" cy="38" rx="14" ry="12" fill="url(#personGrad)"/>
+  <!-- Face features -->
+  <circle cx="22" cy="12" r="1.5" fill="#5D4037"/>
+  <circle cx="28" cy="12" r="1.5" fill="#5D4037"/>
+  <path d="M22,17 Q25,20 28,17" fill="none" stroke="#5D4037" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Hair -->
+  <ellipse cx="25" cy="8" rx="8" ry="5" fill="#5D4037"/>
+</svg>

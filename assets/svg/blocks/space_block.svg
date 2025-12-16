@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#78909C"/>
+      <stop offset="30%" style="stop-color:#546E7A"/>
+      <stop offset="70%" style="stop-color:#455A64"/>
+      <stop offset="100%" style="stop-color:#37474F"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4DD0E1"/>
+      <stop offset="100%" style="stop-color:#00BCD4"/>
+    </linearGradient>
+    <linearGradient id="lightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#76FF03"/>
+      <stop offset="100%" style="stop-color:#64DD17"/>
+    </linearGradient>
+  </defs>
+  <!-- Main module body -->
+  <rect x="2" y="2" width="96" height="96" rx="6" fill="url(#metalGrad)" stroke="#263238" stroke-width="2"/>
+  <!-- Metal panel lines -->
+  <line x1="2" y1="50" x2="98" y2="50" stroke="#263238" stroke-width="2"/>
+  <line x1="33" y1="2" x2="33" y2="98" stroke="#263238" stroke-width="1.5"/>
+  <line x1="67" y1="2" x2="67" y2="98" stroke="#263238" stroke-width="1.5"/>
+  <!-- Top highlight -->
+  <rect x="2" y="2" width="96" height="10" rx="6" fill="rgba(255,255,255,0.15)"/>
+  <!-- Tech screens Row 1 -->
+  <rect x="8" y="15" width="20" height="28" rx="3" fill="url(#screenGrad)" stroke="#006064" stroke-width="2"/>
+  <rect x="10" y="17" width="16" height="8" rx="1" fill="#263238"/>
+  <rect x="10" y="27" width="8" height="4" rx="1" fill="url(#lightGrad)"/>
+  <rect x="19" y="27" width="5" height="4" rx="1" fill="#FF5722"/>
+  <rect x="40" y="15" width="20" height="28" rx="3" fill="url(#screenGrad)" stroke="#006064" stroke-width="2"/>
+  <rect x="42" y="17" width="16" height="8" rx="1" fill="#263238"/>
+  <rect x="42" y="27" width="8" height="4" rx="1" fill="url(#lightGrad)"/>
+  <rect x="51" y="27" width="5" height="4" rx="1" fill="#FF5722"/>
+  <rect x="72" y="15" width="20" height="28" rx="3" fill="url(#screenGrad)" stroke="#006064" stroke-width="2"/>
+  <rect x="74" y="17" width="16" height="8" rx="1" fill="#263238"/>
+  <rect x="74" y="27" width="8" height="4" rx="1" fill="url(#lightGrad)"/>
+  <rect x="83" y="27" width="5" height="4" rx="1" fill="#FF5722"/>
+  <!-- Tech screens Row 2 -->
+  <rect x="8" y="57" width="20" height="28" rx="3" fill="url(#screenGrad)" stroke="#006064" stroke-width="2"/>
+  <rect x="10" y="59" width="16" height="8" rx="1" fill="#263238"/>
+  <rect x="10" y="69" width="8" height="4" rx="1" fill="url(#lightGrad)"/>
+  <rect x="19" y="69" width="5" height="4" rx="1" fill="#FFEB3B"/>
+  <rect x="40" y="57" width="20" height="28" rx="3" fill="url(#screenGrad)" stroke="#006064" stroke-width="2"/>
+  <rect x="42" y="59" width="16" height="8" rx="1" fill="#263238"/>
+  <rect x="42" y="69" width="8" height="4" rx="1" fill="url(#lightGrad)"/>
+  <rect x="51" y="69" width="5" height="4" rx="1" fill="#FFEB3B"/>
+  <rect x="72" y="57" width="20" height="28" rx="3" fill="url(#screenGrad)" stroke="#006064" stroke-width="2"/>
+  <rect x="74" y="59" width="16" height="8" rx="1" fill="#263238"/>
+  <rect x="74" y="69" width="8" height="4" rx="1" fill="url(#lightGrad)"/>
+  <rect x="83" y="69" width="5" height="4" rx="1" fill="#FFEB3B"/>
+  <!-- Rivets -->
+  <circle cx="6" cy="6" r="2" fill="#37474F" stroke="#263238"/>
+  <circle cx="94" cy="6" r="2" fill="#37474F" stroke="#263238"/>
+  <circle cx="6" cy="94" r="2" fill="#37474F" stroke="#263238"/>
+  <circle cx="94" cy="94" r="2" fill="#37474F" stroke="#263238"/>
+  <!-- Antenna -->
+  <rect x="48" y="0" width="4" height="5" fill="#455A64"/>
+  <circle cx="50" cy="0" r="2" fill="#FF5722"/>
+</svg>

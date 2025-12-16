@@ -13,6 +13,7 @@ dependencies:
   # Game Engine
   flame: ^1.21.0
   flame_audio: ^2.10.2
+  flame_svg: ^1.10.2
 
   # State Management
   flutter_riverpod: ^2.6.1

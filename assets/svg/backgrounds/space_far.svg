@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Distant space station elements -->
+  <g fill="#37474F" opacity="0.4">
+    <rect x="50" y="550" width="60" height="15" rx="2"/>
+    <rect x="70" y="520" width="20" height="45"/>
+    <circle cx="80" cy="510" r="10"/>
+    <rect x="280" y="580" width="50" height="12" rx="2"/>
+    <rect x="295" y="550" width="20" height="42"/>
+    <circle cx="305" cy="540" r="8"/>
+  </g>
+  <!-- Distant satellites -->
+  <g fill="#546E7A" opacity="0.3">
+    <rect x="150" y="480" width="8" height="3"/>
+    <rect x="145" y="478" width="3" height="7"/>
+    <rect x="160" y="478" width="3" height="7"/>
+    <rect x="320" y="450" width="6" height="2"/>
+    <rect x="316" y="448" width="2" height="6"/>
+    <rect x="328" y="448" width="2" height="6"/>
+  </g>
+  <!-- Asteroid belt hints -->
+  <g fill="#78909C" opacity="0.25">
+    <ellipse cx="100" cy="620" rx="8" ry="5"/>
+    <ellipse cx="180" cy="600" rx="6" ry="4"/>
+    <ellipse cx="250" cy="640" rx="10" ry="6"/>
+    <ellipse cx="340" cy="610" rx="7" ry="4"/>
+  </g>
+  <!-- More distant stars -->
+  <g fill="white" opacity="0.4">
+    <circle cx="130" cy="500" r="0.8"/>
+    <circle cx="220" cy="530" r="0.6"/>
+    <circle cx="360" cy="490" r="0.7"/>
+  </g>
+</svg>

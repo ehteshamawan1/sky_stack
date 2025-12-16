@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Medium distance dunes -->
+  <g fill="#E8B87D">
+    <ellipse cx="0" cy="680" rx="120" ry="70"/>
+    <ellipse cx="150" cy="650" rx="140" ry="80"/>
+    <ellipse cx="320" cy="700" rx="130" ry="65"/>
+    <ellipse cx="450" cy="660" rx="100" ry="75"/>
+  </g>
+  <!-- Adobe ruins -->
+  <g fill="#C27D48">
+    <rect x="50" y="600" width="40" height="80"/>
+    <rect x="45" y="595" width="50" height="10"/>
+    <rect x="280" y="620" width="35" height="60"/>
+    <rect x="275" y="615" width="45" height="8"/>
+  </g>
+  <!-- Ruins windows -->
+  <g fill="#5D4037">
+    <path d="M58,620 L58,635 Q70,610 82,635 L82,620 Z"/>
+    <path d="M288,640 L288,650 Q297,630 306,650 L306,640 Z"/>
+  </g>
+  <!-- Cacti -->
+  <g fill="#4CAF50">
+    <ellipse cx="180" cy="670" rx="6" ry="25"/>
+    <ellipse cx="175" cy="660" rx="4" ry="10" transform="rotate(-30 175 660)"/>
+    <ellipse cx="185" cy="655" rx="4" ry="10" transform="rotate(30 185 655)"/>
+    <ellipse cx="350" cy="690" rx="5" ry="20"/>
+  </g>
+</svg>

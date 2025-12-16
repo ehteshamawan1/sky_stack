@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80">
+  <defs>
+    <linearGradient id="magicParachuteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CE93D8"/>
+      <stop offset="100%" style="stop-color:#9C27B0"/>
+    </linearGradient>
+    <radialGradient id="magicGlowChar">
+      <stop offset="0%" style="stop-color:#FFF59D;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#FFF59D;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <!-- Magic floating cape/parachute -->
+  <path d="M5,15 Q30,0 55,15 Q55,25 30,35 Q5,25 5,15" fill="url(#magicParachuteGrad)"/>
+  <!-- Magic sparkles on cape -->
+  <circle cx="15" cy="12" r="2" fill="#FFF59D"/>
+  <circle cx="30" cy="8" r="2" fill="#FFF59D"/>
+  <circle cx="45" cy="12" r="2" fill="#FFF59D"/>
+  <!-- Body (wizard robe) -->
+  <path d="M20,42 L15,75 L45,75 L40,42" fill="#7B1FA2"/>
+  <!-- Robe details -->
+  <path d="M25,50 L22,75" fill="none" stroke="#4A148C" stroke-width="1"/>
+  <path d="M35,50 L38,75" fill="none" stroke="#4A148C" stroke-width="1"/>
+  <!-- Belt with gem -->
+  <rect x="18" y="48" width="24" height="4" fill="#FFD54F"/>
+  <circle cx="30" cy="50" r="3" fill="#E91E63"/>
+  <!-- Head -->
+  <circle cx="30" cy="38" r="6" fill="#FFCC80"/>
+  <!-- Wizard hat -->
+  <polygon points="30,18 22,38 38,38" fill="#4A148C"/>
+  <ellipse cx="30" cy="38" rx="10" ry="3" fill="#4A148C"/>
+  <!-- Star on hat -->
+  <polygon points="30,24 31,27 34,27 32,29 33,32 30,30 27,32 28,29 26,27 29,27" fill="#FFF59D"/>
+  <!-- Eyes -->
+  <circle cx="28" cy="37" r="1" fill="#333"/>
+  <circle cx="32" cy="37" r="1" fill="#333"/>
+  <!-- Beard -->
+  <path d="M25,40 Q30,50 35,40" fill="#ECEFF1"/>
+  <!-- Magic wand -->
+  <rect x="42" y="45" width="2" height="18" fill="#8D6E63"/>
+  <circle cx="43" cy="44" r="4" fill="url(#magicGlowChar)"/>
+  <circle cx="43" cy="44" r="2" fill="#FFF59D"/>
+  <!-- Boots -->
+  <ellipse cx="25" cy="76" rx="5" ry="3" fill="#5D4037"/>
+  <ellipse cx="35" cy="76" rx="5" ry="3" fill="#5D4037"/>
+</svg>

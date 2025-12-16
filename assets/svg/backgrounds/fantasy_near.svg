@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Large foreground trees -->
+  <g fill="#311B92">
+    <polygon points="-30,800 40,400 110,800"/>
+    <polygon points="290,800 360,420 430,800"/>
+  </g>
+  <!-- Large tree trunks -->
+  <g fill="#4E342E">
+    <rect x="20" y="650" width="40" height="150"/>
+    <rect x="340" y="660" width="40" height="140"/>
+  </g>
+  <!-- Tree bark details -->
+  <g fill="#3E2723" opacity="0.5">
+    <rect x="30" y="680" width="5" height="30"/>
+    <rect x="45" y="700" width="5" height="25"/>
+    <rect x="350" y="690" width="5" height="28"/>
+    <rect x="365" y="710" width="5" height="22"/>
+  </g>
+  <!-- Glowing flowers -->
+  <g>
+    <circle cx="70" cy="730" r="8" fill="#FF4081"/>
+    <circle cx="70" cy="730" r="4" fill="#FF80AB"/>
+    <circle cx="90" cy="750" r="6" fill="#7C4DFF"/>
+    <circle cx="90" cy="750" r="3" fill="#B388FF"/>
+    <circle cx="330" cy="740" r="7" fill="#00E5FF"/>
+    <circle cx="330" cy="740" r="3.5" fill="#84FFFF"/>
+    <circle cx="310" cy="760" r="5" fill="#FFEB3B"/>
+    <circle cx="310" cy="760" r="2.5" fill="#FFF59D"/>
+  </g>
+  <!-- Large mushroom -->
+  <ellipse cx="150" cy="720" rx="25" ry="15" fill="#E91E63"/>
+  <rect x="140" y="720" width="20" height="30" fill="#FFCCBC"/>
+  <g fill="white" opacity="0.7">
+    <circle cx="140" cy="712" r="4"/>
+    <circle cx="155" cy="716" r="3"/>
+    <circle cx="165" cy="710" r="2.5"/>
+  </g>
+  <!-- Stone path -->
+  <g fill="#9E9E9E">
+    <ellipse cx="180" cy="770" rx="20" ry="10"/>
+    <ellipse cx="220" cy="775" rx="18" ry="9"/>
+    <ellipse cx="260" cy="768" rx="22" ry="11"/>
+  </g>
+  <!-- Grassy ground -->
+  <rect x="0" y="760" width="400" height="40" fill="#1B5E20"/>
+  <!-- Grass tufts -->
+  <g fill="#2E7D32">
+    <polygon points="60,760 65,745 70,760"/>
+    <polygon points="100,760 104,748 108,760"/>
+    <polygon points="280,760 285,742 290,760"/>
+    <polygon points="350,760 354,750 358,760"/>
+  </g>
+  <!-- Magic circle glow on ground -->
+  <ellipse cx="200" cy="770" rx="80" ry="15" fill="#E1BEE7" opacity="0.3"/>
+</svg>

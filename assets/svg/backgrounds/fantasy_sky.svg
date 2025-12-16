@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="fantasyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A148C"/>
+      <stop offset="30%" style="stop-color:#7B1FA2"/>
+      <stop offset="60%" style="stop-color:#9C27B0"/>
+      <stop offset="100%" style="stop-color:#CE93D8"/>
+    </linearGradient>
+    <radialGradient id="magicGlowBg">
+      <stop offset="0%" style="stop-color:#E1BEE7;stop-opacity:0.5"/>
+      <stop offset="100%" style="stop-color:#E1BEE7;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <!-- Magical twilight sky -->
+  <rect width="400" height="800" fill="url(#fantasyGrad)"/>
+  <!-- Magic particles/sparkles -->
+  <g fill="#FFF59D">
+    <circle cx="50" cy="60" r="2" opacity="0.9"/>
+    <circle cx="120" cy="40" r="1.5" opacity="0.7"/>
+    <circle cx="200" cy="80" r="2" opacity="0.8"/>
+    <circle cx="280" cy="50" r="1.5" opacity="0.9"/>
+    <circle cx="350" cy="90" r="2" opacity="0.7"/>
+    <circle cx="80" cy="150" r="1.5" opacity="0.8"/>
+    <circle cx="160" cy="120" r="2" opacity="0.9"/>
+    <circle cx="240" cy="180" r="1.5" opacity="0.7"/>
+    <circle cx="320" cy="140" r="2" opacity="0.8"/>
+    <circle cx="30" cy="220" r="1.5" opacity="0.9"/>
+    <circle cx="100" cy="260" r="2" opacity="0.7"/>
+    <circle cx="180" cy="240" r="1.5" opacity="0.8"/>
+    <circle cx="260" cy="280" r="2" opacity="0.9"/>
+    <circle cx="340" cy="250" r="1.5" opacity="0.7"/>
+    <circle cx="380" cy="200" r="2" opacity="0.8"/>
+  </g>
+  <!-- Magical aurora effect -->
+  <ellipse cx="200" cy="150" rx="180" ry="80" fill="url(#magicGlowBg)"/>
+  <!-- Floating crystal -->
+  <polygon points="320,120 330,100 340,120 330,140" fill="#B2EBF2" opacity="0.6"/>
+  <polygon points="80,200 85,185 95,200 90,215 80,215" fill="#F8BBD0" opacity="0.5"/>
+  <!-- Crescent moon -->
+  <circle cx="100" cy="100" r="30" fill="#FFF9C4"/>
+  <circle cx="110" cy="95" r="26" fill="url(#fantasyGrad)"/>
+  <!-- Stars with twinkle effect -->
+  <g fill="white">
+    <polygon points="300,180 302,188 310,188 304,193 306,200 300,196 294,200 296,193 290,188 298,188" opacity="0.8"/>
+    <polygon points="150,280 151,285 156,285 152,288 153,293 150,290 147,293 148,288 144,285 149,285" opacity="0.7"/>
+  </g>
+</svg>

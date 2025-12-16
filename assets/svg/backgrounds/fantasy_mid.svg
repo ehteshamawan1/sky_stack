@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Medium distance enchanted forest -->
+  <g fill="#4A148C">
+    <!-- Trees -->
+    <polygon points="30,800 60,500 90,800"/>
+    <polygon points="80,800 115,480 150,800"/>
+    <polygon points="250,800 290,520 330,800"/>
+    <polygon points="310,800 340,490 370,800"/>
+  </g>
+  <!-- Tree trunks -->
+  <g fill="#3E2723">
+    <rect x="50" y="700" width="20" height="100"/>
+    <rect x="105" y="680" width="20" height="120"/>
+    <rect x="280" y="700" width="20" height="100"/>
+    <rect x="330" y="690" width="20" height="110"/>
+  </g>
+  <!-- Magic mushrooms -->
+  <g>
+    <ellipse cx="180" cy="720" rx="15" ry="10" fill="#E91E63"/>
+    <rect x="175" y="720" width="10" height="15" fill="#FFCCBC"/>
+    <circle cx="175" cy="715" r="2" fill="white" opacity="0.8"/>
+    <circle cx="185" cy="718" r="1.5" fill="white" opacity="0.8"/>
+    <ellipse cx="220" cy="740" rx="12" ry="8" fill="#7C4DFF"/>
+    <rect x="216" y="740" width="8" height="12" fill="#FFCCBC"/>
+    <circle cx="216" cy="736" r="1.5" fill="white" opacity="0.8"/>
+    <circle cx="224" cy="738" r="1" fill="white" opacity="0.8"/>
+  </g>
+  <!-- Floating crystals -->
+  <g fill="#B2EBF2" opacity="0.7">
+    <polygon points="160,550 170,520 180,550 170,560"/>
+    <polygon points="240,500 248,475 256,500 248,508"/>
+  </g>
+  <!-- Magical fireflies -->
+  <g fill="#FFEB3B" opacity="0.8">
+    <circle cx="140" cy="600" r="3"/>
+    <circle cx="260" cy="580" r="2"/>
+    <circle cx="190" cy="640" r="2.5"/>
+    <circle cx="300" cy="620" r="2"/>
+  </g>
+  <!-- Fairy dust trails -->
+  <g fill="#F8BBD0" opacity="0.5">
+    <circle cx="100" cy="550" r="1"/>
+    <circle cx="105" cy="560" r="1.5"/>
+    <circle cx="108" cy="575" r="1"/>
+    <circle cx="300" cy="540" r="1"/>
+    <circle cx="295" cy="555" r="1.5"/>
+    <circle cx="298" cy="568" r="1"/>
+  </g>
+</svg>

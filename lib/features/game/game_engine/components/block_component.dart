@@ -1,7 +1,9 @@
 import 'package:flame/components.dart';
+import 'package:flame_svg/flame_svg.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../utils/svg_cache.dart';
 import 'crane_component.dart';
 
 enum BlockState { attached, falling, landed }
@@ -10,25 +12,27 @@ class BlockComponent extends PositionComponent with HasGameReference {
   final double initialWidth;
   final double initialHeight;
   final Color color;
+  final String theme;
 
   BlockState state = BlockState.attached;
   CraneComponent? attachedCrane;
   double fallVelocity = 0;
   double remainingWidth;
-  double placementOffset = 0; // How far off-center this block was placed
+  double placementOffset = 0;
 
-  Function(BlockComponent, double)? onLandedCallback;
-  Function(BlockComponent)? onFellCallback;
+  // SVG rendering - use cache
+  Svg? _blockSvg;
+  bool _svgLoaded = false;
 
-  // Visual
-  late RectangleComponent blockVisual;
-  late RectangleComponent highlightVisual;
+  // Static cache reference
+  static final SvgCache _svgCache = SvgCache();
 
   BlockComponent({
     required Vector2 position,
     required double width,
     required double height,
     Color? color,
+    this.theme = 'city',
   })  : initialWidth = width,
         initialHeight = height,
         remainingWidth = width,
@@ -43,28 +47,31 @@ class BlockComponent extends PositionComponent with HasGameReference {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Don't add child visuals - we'll render directly in this component
-    // This avoids any confusion with child positioning
+    // Load from cache (much faster than loading each time)
+    final path = 'svg/blocks/${theme}_block.svg';
+    _blockSvg = await _svgCache.get(path);
+    _svgLoaded = _blockSvg != null;
   }
 
   @override
   void render(Canvas canvas) {
-    // Draw block directly without child components
-    // With Anchor.center in Flame, (0,0) is at top-left of component bounds
-    // So draw from (0,0) to fill the component area correctly
-    final rect = Rect.fromLTWH(0, 0, initialWidth, initialHeight);
+    if (_svgLoaded && _blockSvg != null) {
+      // Render SVG scaled to block size
+      canvas.save();
+      final scaleX = initialWidth / 100;
+      final scaleY = initialHeight / 100;
+      canvas.scale(scaleX, scaleY);
+      _blockSvg!.render(canvas, Vector2(100, 100));
+      canvas.restore();
+    } else {
+      // Fallback: Draw block with color
+      final rect = Rect.fromLTWH(0, 0, initialWidth, initialHeight);
+      canvas.drawRect(rect, Paint()..color = color);
 
-    // Main block color
-    canvas.drawRect(rect, Paint()..color = color);
-
-    // Highlight on top (top 20% of block)
-    final highlightRect = Rect.fromLTWH(
-      0,
-      0,
-      initialWidth,
-      initialHeight * 0.2,
-    );
-    canvas.drawRect(highlightRect, Paint()..color = Colors.white.withOpacity(0.3));
+      // Highlight on top
+      final highlightRect = Rect.fromLTWH(0, 0, initialWidth, initialHeight * 0.2);
+      canvas.drawRect(highlightRect, Paint()..color = Colors.white.withOpacity(0.3));
+    }
   }
 
   void attachToCrane(CraneComponent crane) {
@@ -86,33 +93,31 @@ class BlockComponent extends PositionComponent with HasGameReference {
     detachFromCrane();
   }
 
+  Function(BlockComponent, double)? onLandedCallback;
+  Function(BlockComponent)? onFellCallback;
+
   @override
   void update(double dt) {
     super.update(dt);
 
-    switch (state) {
-      case BlockState.attached:
-        // Follow crane hook
-        if (attachedCrane != null) {
-          position = attachedCrane!.hookPosition + Vector2(0, initialHeight / 2 + 10);
-        }
-        break;
+    // Only process if not landed (optimization)
+    if (state == BlockState.landed) return;
 
-      case BlockState.falling:
-        // Apply gravity
-        fallVelocity += AppConstants.gravity * dt;
-        position.y += fallVelocity * dt;
+    if (state == BlockState.attached) {
+      // Follow crane hook
+      if (attachedCrane != null) {
+        position = attachedCrane!.hookPosition + Vector2(0, initialHeight / 2 + 10);
+      }
+    } else if (state == BlockState.falling) {
+      // Apply gravity
+      fallVelocity += AppConstants.gravity * dt;
+      position.y += fallVelocity * dt;
 
-        // Check if fallen off screen
-        if (position.y > game.size.y + 100) {
-          onFellCallback?.call(this);
-          removeFromParent();
-        }
-        break;
-
-      case BlockState.landed:
-        // Block is stationary
-        break;
+      // Check if fallen off screen
+      if (position.y > game.size.y + 100) {
+        onFellCallback?.call(this);
+        removeFromParent();
+      }
     }
   }
 
@@ -120,8 +125,6 @@ class BlockComponent extends PositionComponent with HasGameReference {
     state = BlockState.landed;
     position.y = targetY;
     fallVelocity = 0;
-
-    // The horizontal position stays where it landed (offset from center adds to tower lean)
     onLandedCallback?.call(this, position.x);
   }
 }

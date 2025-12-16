@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80">
+  <defs>
+    <radialGradient id="bubbleGradChar">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#64B5F6;stop-opacity:0.6"/>
+    </radialGradient>
+  </defs>
+  <!-- Large bubble (instead of umbrella) -->
+  <circle cx="30" cy="20" r="18" fill="url(#bubbleGradChar)" stroke="#42A5F5" stroke-width="1"/>
+  <ellipse cx="24" cy="14" rx="5" ry="3" fill="white" opacity="0.6"/>
+  <!-- Small bubbles -->
+  <circle cx="12" cy="15" r="4" fill="url(#bubbleGradChar)" stroke="#42A5F5" stroke-width="0.5"/>
+  <circle cx="48" cy="18" r="3" fill="url(#bubbleGradChar)" stroke="#42A5F5" stroke-width="0.5"/>
+  <!-- Diver body (wetsuit) -->
+  <ellipse cx="30" cy="55" rx="10" ry="14" fill="#1565C0"/>
+  <!-- Diving mask area -->
+  <circle cx="30" cy="42" r="9" fill="#212121"/>
+  <!-- Face in mask -->
+  <ellipse cx="30" cy="42" rx="7" ry="6" fill="#FFCC80"/>
+  <!-- Mask frame -->
+  <ellipse cx="30" cy="42" rx="8" ry="6.5" fill="none" stroke="#37474F" stroke-width="2"/>
+  <!-- Mask glass reflection -->
+  <ellipse cx="26" cy="40" rx="3" ry="2" fill="#B3E5FC" opacity="0.4"/>
+  <!-- Eyes -->
+  <circle cx="27" cy="42" r="1.5" fill="#333"/>
+  <circle cx="33" cy="42" r="1.5" fill="#333"/>
+  <!-- Snorkel -->
+  <rect x="40" y="35" width="3" height="15" rx="1" fill="#FFC107"/>
+  <ellipse cx="41.5" cy="34" rx="3" ry="2" fill="#FFC107"/>
+  <!-- Flippers -->
+  <ellipse cx="24" cy="75" rx="8" ry="4" fill="#FF9800"/>
+  <ellipse cx="36" cy="75" rx="8" ry="4" fill="#FF9800"/>
+  <!-- Air tank hint -->
+  <ellipse cx="38" cy="52" rx="4" ry="8" fill="#FFD54F"/>
+</svg>

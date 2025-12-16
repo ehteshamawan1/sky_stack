@@ -6,6 +6,8 @@ import 'components/block_component.dart';
 import 'components/tower_component.dart';
 import 'components/background_component.dart';
 import 'components/umbrella_person_component.dart';
+import 'components/particle_effects.dart';
+import 'components/score_popup_component.dart';
 import 'systems/scoring_system.dart';
 import 'systems/combo_system.dart';
 import '../../../core/constants/app_constants.dart';
@@ -45,6 +47,14 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   // Block color index for variety
   int _colorIndex = 0;
 
+  // Screen shake variables
+  double _shakeIntensity = 0;
+  double _shakeDuration = 0;
+  Vector2 _shakeOffset = Vector2.zero();
+
+  // Current theme
+  String currentTheme = 'city';
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -53,8 +63,8 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     scoringSystem = ScoringSystem();
     comboSystem = ComboSystem();
 
-    // Add background
-    background = BackgroundComponent();
+    // Add background with current theme
+    background = BackgroundComponent(theme: currentTheme);
     add(background);
 
     // Add tower (manages placed blocks)
@@ -73,7 +83,7 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   }
 
   void spawnBlock() {
-    // Get next color
+    // Get next color (used as fallback if SVG fails)
     final color = AppColors.blockColors[_colorIndex % AppColors.blockColors.length];
     _colorIndex++;
 
@@ -83,6 +93,7 @@ class SkyStackGame extends FlameGame with TapCallbacks {
       width: AppConstants.blockWidth,
       height: AppConstants.blockHeight,
       color: color,
+      theme: currentTheme,
     );
     currentBlock!.attachToCrane(crane);
     add(currentBlock!);
@@ -112,6 +123,9 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   void update(double dt) {
     super.update(dt);
 
+    // Update screen shake
+    _updateScreenShake(dt);
+
     if (gameState != GameState.playing) return;
 
     // Check for block collision with tower while falling
@@ -126,6 +140,30 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     if (tower.hasToppled()) {
       gameState = GameState.gameOver;
       onGameOver?.call();
+    }
+  }
+
+  /// Triggers screen shake effect for bad drops
+  void triggerScreenShake({double intensity = 8, double duration = 0.3}) {
+    _shakeIntensity = intensity;
+    _shakeDuration = duration;
+  }
+
+  void _updateScreenShake(double dt) {
+    if (_shakeDuration > 0) {
+      _shakeDuration -= dt;
+      _shakeOffset = Vector2(
+        (_random.nextDouble() - 0.5) * 2 * _shakeIntensity,
+        (_random.nextDouble() - 0.5) * 2 * _shakeIntensity,
+      );
+
+      // Apply shake to camera
+      camera.viewfinder.position = _shakeOffset;
+
+      if (_shakeDuration <= 0) {
+        _shakeOffset = Vector2.zero();
+        camera.viewfinder.position = Vector2.zero();
+      }
     }
   }
 
@@ -146,16 +184,28 @@ class SkyStackGame extends FlameGame with TapCallbacks {
       quality = PlacementQuality.perfect;
       // Trigger perfect placement indicator
       onPerfectPlacement?.call();
+      // Add golden sparkle effect for perfect placement
+      add(ParticleEffects.perfectDropEffect(block.position));
     } else if (absOffset <= AppConstants.goodThreshold) {
       quality = PlacementQuality.good;
     } else {
       quality = PlacementQuality.bad;
+      // Screen shake for bad placement
+      triggerScreenShake(intensity: 6, duration: 0.25);
     }
+
+    // Add dust effect for all landings
+    add(ParticleEffects.dustEffect(block.position + Vector2(0, AppConstants.blockHeight / 2), AppConstants.blockWidth));
 
     // Update combo (only after first block)
     // Combo builds for placements within comboThreshold (5px), which includes perfect (2px)
     if (!isFirstBlock && isComboWorthy) {
       combo = comboSystem.incrementCombo(combo);
+      // Combo celebration effect
+      if (combo >= 3) {
+        add(ParticleEffects.comboEffect(block.position, combo));
+        add(ComboIndicatorComponent(comboLevel: combo, position: block.position - Vector2(0, 60)));
+      }
     } else if (!isFirstBlock) {
       combo = comboSystem.resetCombo();
     }
@@ -166,10 +216,22 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     score += points;
     onScoreUpdate?.call(score);
 
+    // Add score popup
+    add(ScorePopupComponent(
+      score: points,
+      position: block.position - Vector2(0, 20),
+      isPerfect: isPerfect,
+      isCombo: combo > 1,
+      comboLevel: combo,
+    ));
+
     // Add block to tower with its placement offset
     tower.addBlock(block, offset);
     blocksPlaced++;
     onBlocksUpdate?.call(blocksPlaced);
+
+    // Update parallax background scroll
+    updateParallax();
 
     // Spawn umbrella people based on placement quality
     _spawnUmbrellaPeople(block, quality, isComboWorthy);
@@ -219,7 +281,11 @@ class SkyStackGame extends FlameGame with TapCallbacks {
         final person = UmbrellaPersonComponent(
           startPosition: Vector2(startX, startY),
           targetPosition: Vector2(startX, targetY),
+          theme: currentTheme,
           onArrived: () {
+            // Only update if game is still active (not game over)
+            if (gameState == GameState.gameOver) return;
+
             // Person entered the building - add to population
             population++;
             onPopulationUpdate?.call(population);
@@ -259,6 +325,9 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     // Remove any floating umbrella people
     children.whereType<UmbrellaPersonComponent>().toList().forEach((p) => p.removeFromParent());
 
+    // Reset background scroll position
+    background.resetScroll();
+
     spawnBlock();
 
     onScoreUpdate?.call(score);
@@ -282,5 +351,22 @@ class SkyStackGame extends FlameGame with TapCallbacks {
       gameState = GameState.playing;
       resumeEngine();
     }
+  }
+
+  /// Change the current theme (affects blocks and backgrounds)
+  void setTheme(String theme) {
+    currentTheme = theme;
+    background.theme = theme;
+  }
+
+  /// Change the time of day (day, sunset, night)
+  void setTimeOfDay(TimeOfDay timeOfDay) {
+    background.timeOfDay = timeOfDay;
+  }
+
+  /// Update parallax scroll based on tower height
+  void updateParallax() {
+    final towerHeight = tower.blocks.length * AppConstants.blockHeight;
+    background.updateScroll(towerHeight);
   }
 }

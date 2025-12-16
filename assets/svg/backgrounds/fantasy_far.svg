@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Distant mountains/hills -->
+  <g fill="#4A148C" opacity="0.5">
+    <polygon points="0,650 80,500 160,650"/>
+    <polygon points="100,680 200,480 300,680"/>
+    <polygon points="250,660 350,520 450,660"/>
+  </g>
+  <!-- Distant castle silhouette -->
+  <g fill="#311B92" opacity="0.4">
+    <rect x="150" y="520" width="100" height="130"/>
+    <rect x="140" y="480" width="30" height="70"/>
+    <polygon points="140,480 155,440 170,480"/>
+    <rect x="230" y="490" width="30" height="60"/>
+    <polygon points="230,490 245,450 260,490"/>
+    <rect x="180" y="460" width="40" height="90"/>
+    <polygon points="180,460 200,400 220,460"/>
+  </g>
+  <!-- Distant floating islands -->
+  <g fill="#7B1FA2" opacity="0.3">
+    <ellipse cx="80" cy="550" rx="50" ry="20"/>
+    <ellipse cx="320" cy="520" rx="40" ry="15"/>
+  </g>
+  <!-- Mystical fog -->
+  <ellipse cx="200" cy="620" rx="200" ry="40" fill="#CE93D8" opacity="0.2"/>
+</svg>

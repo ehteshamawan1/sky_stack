@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Distant coral formations -->
+  <g fill="#FF8A80" opacity="0.4">
+    <ellipse cx="50" cy="650" rx="40" ry="80"/>
+    <ellipse cx="70" cy="680" rx="25" ry="50"/>
+    <ellipse cx="350" cy="620" rx="35" ry="90"/>
+    <ellipse cx="320" cy="660" rx="20" ry="60"/>
+  </g>
+  <!-- Distant seaweed -->
+  <g fill="#4CAF50" opacity="0.3">
+    <path d="M100,800 Q90,700 100,620 Q110,700 100,800" stroke-width="0"/>
+    <path d="M115,800 Q105,720 115,650 Q125,720 115,800" stroke-width="0"/>
+    <path d="M280,800 Q270,680 280,600 Q290,680 280,800" stroke-width="0"/>
+  </g>
+  <!-- Distant bubbles -->
+  <g fill="#B3E5FC" opacity="0.2">
+    <circle cx="150" cy="550" r="4"/>
+    <circle cx="200" cy="580" r="3"/>
+    <circle cx="250" cy="530" r="5"/>
+  </g>
+  <!-- Distant jellyfish -->
+  <g fill="#E1BEE7" opacity="0.3">
+    <ellipse cx="180" cy="450" rx="15" ry="10"/>
+    <path d="M170,455 Q168,480 172,490" fill="none" stroke="#E1BEE7" stroke-width="2" opacity="0.3"/>
+    <path d="M180,458 Q178,485 182,495" fill="none" stroke="#E1BEE7" stroke-width="2" opacity="0.3"/>
+    <path d="M190,455 Q192,480 188,490" fill="none" stroke="#E1BEE7" stroke-width="2" opacity="0.3"/>
+  </g>
+</svg>

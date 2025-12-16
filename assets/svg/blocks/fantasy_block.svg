@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9575CD"/>
+      <stop offset="50%" style="stop-color:#7E57C2"/>
+      <stop offset="100%" style="stop-color:#673AB7"/>
+    </linearGradient>
+    <linearGradient id="windowGlowFantasy" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF59D"/>
+      <stop offset="100%" style="stop-color:#FFEE58"/>
+    </linearGradient>
+    <radialGradient id="magicGlow">
+      <stop offset="0%" style="stop-color:#E1BEE7;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#CE93D8;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <!-- Main castle block -->
+  <rect x="2" y="2" width="96" height="96" rx="2" fill="url(#stoneGrad)" stroke="#4527A0" stroke-width="2"/>
+  <!-- Stone brick pattern -->
+  <line x1="2" y1="25" x2="98" y2="25" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="2" y1="50" x2="98" y2="50" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="2" y1="75" x2="98" y2="75" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="25" y1="2" x2="25" y2="25" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="50" y1="2" x2="50" y2="25" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="75" y1="2" x2="75" y2="25" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="12" y1="25" x2="12" y2="50" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="37" y1="25" x2="37" y2="50" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="62" y1="25" x2="62" y2="50" stroke="#5E35B1" stroke-width="1"/>
+  <line x1="87" y1="25" x2="87" y2="50" stroke="#5E35B1" stroke-width="1"/>
+  <!-- Top highlight -->
+  <rect x="2" y="2" width="96" height="10" rx="2" fill="rgba(255,255,255,0.2)"/>
+  <!-- Gothic arched windows Row 1 -->
+  <path d="M10,48 L10,32 Q20,18 30,32 L30,48 Z" fill="url(#windowGlowFantasy)" stroke="#4527A0" stroke-width="2"/>
+  <line x1="20" y1="48" x2="20" y2="25" stroke="#4527A0" stroke-width="1"/>
+  <path d="M38,48 L38,32 Q48,18 58,32 L58,48 Z" fill="url(#windowGlowFantasy)" stroke="#4527A0" stroke-width="2"/>
+  <line x1="48" y1="48" x2="48" y2="25" stroke="#4527A0" stroke-width="1"/>
+  <path d="M66,48 L66,32 Q76,18 86,32 L86,48 Z" fill="url(#windowGlowFantasy)" stroke="#4527A0" stroke-width="2"/>
+  <line x1="76" y1="48" x2="76" y2="25" stroke="#4527A0" stroke-width="1"/>
+  <!-- Gothic arched windows Row 2 -->
+  <path d="M10,90 L10,65 Q20,52 30,65 L30,90 Z" fill="url(#windowGlowFantasy)" stroke="#4527A0" stroke-width="2"/>
+  <line x1="20" y1="90" x2="20" y2="58" stroke="#4527A0" stroke-width="1"/>
+  <path d="M38,90 L38,65 Q48,52 58,65 L58,90 Z" fill="url(#windowGlowFantasy)" stroke="#4527A0" stroke-width="2"/>
+  <line x1="48" y1="90" x2="48" y2="58" stroke="#4527A0" stroke-width="1"/>
+  <path d="M66,90 L66,65 Q76,52 86,65 L86,90 Z" fill="url(#windowGlowFantasy)" stroke="#4527A0" stroke-width="2"/>
+  <line x1="76" y1="90" x2="76" y2="58" stroke="#4527A0" stroke-width="1"/>
+  <!-- Magic sparkles -->
+  <circle cx="8" cy="8" r="3" fill="url(#magicGlow)"/>
+  <circle cx="92" cy="15" r="2" fill="url(#magicGlow)"/>
+  <circle cx="5" cy="60" r="2.5" fill="url(#magicGlow)"/>
+  <circle cx="95" cy="80" r="2" fill="url(#magicGlow)"/>
+  <!-- Torch decorations -->
+  <rect x="33" y="50" width="4" height="8" fill="#5D4037"/>
+  <ellipse cx="35" cy="48" rx="4" ry="5" fill="#FF9800"/>
+  <ellipse cx="35" cy="46" rx="2" ry="3" fill="#FFEB3B"/>
+  <rect x="63" y="50" width="4" height="8" fill="#5D4037"/>
+  <ellipse cx="65" cy="48" rx="4" ry="5" fill="#FF9800"/>
+  <ellipse cx="65" cy="46" rx="2" ry="3" fill="#FFEB3B"/>
+  <!-- Banner -->
+  <rect x="45" y="5" width="10" height="15" fill="#D32F2F"/>
+  <polygon points="45,20 50,25 55,20" fill="#D32F2F"/>
+</svg>

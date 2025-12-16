@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <!-- Medium distance coral -->
+  <g fill="#FF5252">
+    <ellipse cx="30" cy="620" rx="50" ry="100"/>
+    <ellipse cx="60" cy="680" rx="30" ry="60"/>
+    <ellipse cx="370" cy="600" rx="45" ry="110"/>
+    <ellipse cx="340" cy="670" rx="25" ry="70"/>
+  </g>
+  <!-- Coral texture -->
+  <g fill="#FF8A80" opacity="0.6">
+    <circle cx="20" cy="580" r="8"/>
+    <circle cx="40" cy="560" r="6"/>
+    <circle cx="35" cy="600" r="7"/>
+    <circle cx="360" cy="550" r="7"/>
+    <circle cx="380" cy="580" r="5"/>
+  </g>
+  <!-- Seaweed -->
+  <g fill="#66BB6A">
+    <path d="M120,800 Q100,680 120,580 Q140,680 120,800"/>
+    <path d="M140,800 Q120,700 140,610 Q160,700 140,800"/>
+    <path d="M260,800 Q240,660 260,550 Q280,660 260,800"/>
+    <path d="M280,800 Q260,700 280,600 Q300,700 280,800"/>
+  </g>
+  <!-- Fish school -->
+  <g fill="#FFB74D">
+    <ellipse cx="150" cy="500" rx="10" ry="5"/>
+    <polygon points="140,500 132,494 132,506" fill="#FFB74D"/>
+    <ellipse cx="170" cy="490" rx="8" ry="4"/>
+    <polygon points="162,490 156,486 156,494" fill="#FFB74D"/>
+    <ellipse cx="160" cy="510" rx="9" ry="4.5"/>
+    <polygon points="151,510 144,505 144,515" fill="#FFB74D"/>
+  </g>
+  <!-- Bubbles -->
+  <g fill="#B3E5FC" opacity="0.5">
+    <circle cx="100" cy="450" r="6"/>
+    <circle cx="110" cy="480" r="4"/>
+    <circle cx="300" cy="420" r="5"/>
+    <circle cx="310" cy="460" r="7"/>
+  </g>
+</svg>

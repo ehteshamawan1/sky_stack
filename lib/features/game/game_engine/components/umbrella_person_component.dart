@@ -1,12 +1,15 @@
 import 'dart:math';
 import 'package:flame/components.dart';
+import 'package:flame_svg/flame_svg.dart';
 import 'package:flutter/material.dart';
+import '../utils/svg_cache.dart';
 
 /// A little person floating down with an umbrella
 /// They appear when blocks are placed and float into the building
 class UmbrellaPersonComponent extends PositionComponent with HasGameReference {
   final Vector2 targetPosition;
   final VoidCallback? onArrived;
+  final String theme;
 
   // Movement parameters
   static const double floatSpeed = 80.0;
@@ -17,19 +20,19 @@ class UmbrellaPersonComponent extends PositionComponent with HasGameReference {
   double _initialX = 0;
   bool _hasArrived = false;
 
-  // Visual components
-  late RectangleComponent umbrellaTop;
-  late RectangleComponent umbrellaHandle;
-  late RectangleComponent personBody;
-  late RectangleComponent personHead;
+  // SVG sprite - use cache
+  Svg? _personSvg;
+  bool _svgLoaded = false;
+  static final SvgCache _svgCache = SvgCache();
 
   UmbrellaPersonComponent({
     required Vector2 startPosition,
     required this.targetPosition,
     this.onArrived,
+    this.theme = 'city',
   }) : super(
     position: startPosition,
-    size: Vector2(20, 30),
+    size: Vector2(30, 40),
     anchor: Anchor.center,
   );
 
@@ -38,8 +41,23 @@ class UmbrellaPersonComponent extends PositionComponent with HasGameReference {
     await super.onLoad();
     _initialX = position.x;
 
-    // Random color for variety
-    final random = Random();
+    // Load from cache
+    final path = 'svg/characters/${theme}_umbrella_person.svg';
+    _personSvg = await _svgCache.get(path);
+    _svgLoaded = _personSvg != null;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    if (_svgLoaded && _personSvg != null) {
+      _personSvg!.render(canvas, size);
+    } else {
+      _renderFallback(canvas);
+    }
+  }
+
+  void _renderFallback(Canvas canvas) {
+    final random = Random(hashCode);
     final personColor = Color.fromRGBO(
       100 + random.nextInt(100),
       100 + random.nextInt(100),
@@ -47,37 +65,34 @@ class UmbrellaPersonComponent extends PositionComponent with HasGameReference {
       1,
     );
 
-    // Umbrella top (dome shape approximated with rectangle)
-    umbrellaTop = RectangleComponent(
-      size: Vector2(18, 8),
-      position: Vector2(-9, -15),
-      paint: Paint()..color = Colors.red.shade400,
+    // Umbrella top
+    final umbrellaPaint = Paint()..color = Colors.red.shade400;
+    canvas.drawOval(
+      Rect.fromLTWH(size.x * 0.1, 0, size.x * 0.8, size.y * 0.25),
+      umbrellaPaint,
     );
-    add(umbrellaTop);
 
     // Umbrella handle
-    umbrellaHandle = RectangleComponent(
-      size: Vector2(2, 10),
-      position: Vector2(-1, -7),
-      paint: Paint()..color = Colors.brown.shade600,
+    final handlePaint = Paint()..color = Colors.brown.shade600;
+    canvas.drawRect(
+      Rect.fromLTWH(size.x * 0.45, size.y * 0.2, size.x * 0.1, size.y * 0.25),
+      handlePaint,
     );
-    add(umbrellaHandle);
 
     // Person head
-    personHead = RectangleComponent(
-      size: Vector2(6, 6),
-      position: Vector2(-3, 3),
-      paint: Paint()..color = const Color(0xFFFFDBB4), // Skin tone
+    final skinPaint = Paint()..color = const Color(0xFFFFDBB4);
+    canvas.drawCircle(
+      Offset(size.x * 0.5, size.y * 0.55),
+      size.x * 0.12,
+      skinPaint,
     );
-    add(personHead);
 
     // Person body
-    personBody = RectangleComponent(
-      size: Vector2(8, 10),
-      position: Vector2(-4, 9),
-      paint: Paint()..color = personColor,
+    final bodyPaint = Paint()..color = personColor;
+    canvas.drawRect(
+      Rect.fromLTWH(size.x * 0.35, size.y * 0.65, size.x * 0.3, size.y * 0.3),
+      bodyPaint,
     );
-    add(personBody);
   }
 
   @override
@@ -88,21 +103,15 @@ class UmbrellaPersonComponent extends PositionComponent with HasGameReference {
 
     _elapsedTime += dt;
 
-    // Float down towards target
     final distanceToTarget = targetPosition.y - position.y;
 
     if (distanceToTarget > 5) {
-      // Move down
       position.y += floatSpeed * dt;
-
-      // Gentle side-to-side sway while floating
       position.x = _initialX + sin(_elapsedTime * swayFrequency) * swayAmplitude;
     } else {
-      // Arrived at building
       _hasArrived = true;
       onArrived?.call();
 
-      // Fade out and remove after a short delay
       Future.delayed(const Duration(milliseconds: 300), () {
         removeFromParent();
       });

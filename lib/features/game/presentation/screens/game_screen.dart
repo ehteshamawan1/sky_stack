@@ -1,20 +1,26 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../game_engine/sky_stack_game.dart';
+import '../../providers/theme_provider.dart';
 import '../widgets/game_hud.dart';
 import '../widgets/pause_menu.dart';
 import '../widgets/game_over_dialog.dart';
 
-class GameScreen extends StatefulWidget {
+const String _highScoreKey = 'high_score';
+
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   @override
-  State<GameScreen> createState() => _GameScreenState();
+  ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen> {
   late SkyStackGame game;
+  String? _currentTheme;
   int currentScore = 0;
   int currentCombo = 0;
   int blocksPlaced = 0;
@@ -31,7 +37,16 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     _loadHighScore();
-    _initGame();
+    // Defer game initialization to get theme from provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initGameWithTheme();
+    });
+  }
+
+  void _initGameWithTheme() {
+    final theme = ref.read(gameThemeProvider);
+    _currentTheme = theme;
+    _initGame(theme);
   }
 
   /// Safely call setState, deferring if we're currently building
@@ -48,8 +63,9 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  void _initGame() {
+  void _initGame([String theme = 'city']) {
     game = SkyStackGame()
+      ..currentTheme = theme
       ..onScoreUpdate = (score) {
         _safeSetState(() => currentScore = score);
       }
@@ -68,6 +84,7 @@ class _GameScreenState extends State<GameScreen> {
       ..onPerfectPlacement = () {
         _showPerfectIndicator();
       };
+    setState(() {}); // Trigger rebuild with game ready
   }
 
   void _showPerfectIndicator() {
@@ -93,13 +110,15 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _loadHighScore() async {
-    // TODO: Load from shared preferences
-    setState(() => highScore = 0);
+    final prefs = await SharedPreferences.getInstance();
+    final savedHighScore = prefs.getInt(_highScoreKey) ?? 0;
+    setState(() => highScore = savedHighScore);
   }
 
   Future<void> _saveHighScore(int score) async {
-    // TODO: Save to shared preferences
     if (score > highScore) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_highScoreKey, score);
       setState(() => highScore = score);
     }
   }
@@ -144,6 +163,15 @@ class _GameScreenState extends State<GameScreen> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _isBuilding = false;
     });
+
+    // Show loading if game not initialized yet
+    if (_currentTheme == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return PopScope(
       canPop: false,
@@ -263,60 +291,66 @@ class _PerfectIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: Center(
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0.5, end: 1.2),
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.elasticOut,
-          builder: (context, scale, child) {
-            return TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 200),
-              builder: (context, opacity, _) {
-                return Opacity(
-                  opacity: opacity,
-                  child: Transform.scale(
-                    scale: scale,
-                    child: child,
-                  ),
+      child: SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 100), // Below the crane
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.5, end: 1.0),
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.elasticOut,
+              builder: (context, scale, child) {
+                return TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 150),
+                  builder: (context, opacity, _) {
+                    return Opacity(
+                      opacity: opacity,
+                      child: Transform.scale(
+                        scale: scale,
+                        child: child,
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 32,
-              vertical: 16,
-            ),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.orange.withOpacity(0.6),
-                  blurRadius: 20,
-                  spreadRadius: 5,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10,
                 ),
-              ],
-            ),
-            child: const Text(
-              'PERFECT!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 3,
-                shadows: [
-                  Shadow(
-                    color: Colors.black54,
-                    offset: Offset(2, 2),
-                    blurRadius: 4,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.5),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'PERFECT!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black54,
+                        offset: Offset(1, 1),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

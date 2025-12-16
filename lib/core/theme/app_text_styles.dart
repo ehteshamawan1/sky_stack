@@ -3,93 +3,107 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  // Title Styles - Using Fredoka instead of FredokaOne
-  static TextStyle get gameTitle => GoogleFonts.fredoka(
-        fontSize: 48,
+  // Title Styles - Using Bungee for impactful game titles
+  static TextStyle get gameTitle => GoogleFonts.bungee(
+        fontSize: 42,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-        letterSpacing: 4,
-      );
-
-  static TextStyle get screenTitle => GoogleFonts.fredoka(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      );
-
-  static TextStyle get sectionTitle => GoogleFonts.nunito(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      );
-
-  // Score Styles
-  static TextStyle get scoreDisplay => GoogleFonts.bangers(
-        fontSize: 48,
         color: AppColors.textPrimary,
         letterSpacing: 2,
-      );
-
-  static TextStyle get scoreLarge => GoogleFonts.bangers(
-        fontSize: 32,
-        color: AppColors.textPrimary,
-      );
-
-  static TextStyle get scorePopup => GoogleFonts.bangers(
-        fontSize: 24,
-        color: AppColors.perfect,
         shadows: [
           Shadow(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.3),
             offset: const Offset(2, 2),
             blurRadius: 4,
           ),
         ],
       );
 
-  // Body Styles
-  static TextStyle get bodyLarge => GoogleFonts.nunito(
-        fontSize: 18,
-        color: AppColors.textPrimary,
-      );
-
-  static TextStyle get bodyMedium => GoogleFonts.nunito(
-        fontSize: 16,
-        color: AppColors.textPrimary,
-      );
-
-  static TextStyle get bodySmall => GoogleFonts.nunito(
-        fontSize: 14,
-        color: AppColors.textSecondary,
-      );
-
-  // Button Styles
-  static TextStyle get buttonLarge => GoogleFonts.fredoka(
-        fontSize: 24,
+  static TextStyle get screenTitle => GoogleFonts.bungee(
+        fontSize: 28,
         fontWeight: FontWeight.bold,
         color: AppColors.textPrimary,
       );
 
-  static TextStyle get buttonMedium => GoogleFonts.nunito(
+  static TextStyle get sectionTitle => GoogleFonts.righteous(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+      );
+
+  // Score Styles - Using Orbitron for futuristic game feel
+  static TextStyle get scoreDisplay => GoogleFonts.orbitron(
+        fontSize: 44,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+        letterSpacing: 2,
+      );
+
+  static TextStyle get scoreLarge => GoogleFonts.orbitron(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get scorePopup => GoogleFonts.bungee(
+        fontSize: 22,
+        color: AppColors.perfect,
+        shadows: [
+          Shadow(
+            color: Colors.black.withOpacity(0.5),
+            offset: const Offset(2, 2),
+            blurRadius: 4,
+          ),
+        ],
+      );
+
+  // Body Styles - Using Quicksand for clean readability
+  static TextStyle get bodyLarge => GoogleFonts.quicksand(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get bodyMedium => GoogleFonts.quicksand(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get bodySmall => GoogleFonts.quicksand(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textSecondary,
+      );
+
+  // Button Styles
+  static TextStyle get buttonLarge => GoogleFonts.bungee(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get buttonMedium => GoogleFonts.righteous(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: AppColors.textPrimary,
       );
 
   // HUD Styles
-  static TextStyle get hudLabel => GoogleFonts.nunito(
+  static TextStyle get hudLabel => GoogleFonts.quicksand(
         fontSize: 12,
         fontWeight: FontWeight.bold,
         color: AppColors.textMuted,
+        letterSpacing: 1,
       );
 
-  static TextStyle get hudValue => GoogleFonts.bangers(
-        fontSize: 32,
+  static TextStyle get hudValue => GoogleFonts.orbitron(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
         color: AppColors.textPrimary,
       );
 
-  static TextStyle get comboText => GoogleFonts.bangers(
-        fontSize: 16,
+  static TextStyle get comboText => GoogleFonts.bungee(
+        fontSize: 14,
         fontWeight: FontWeight.bold,
         color: AppColors.textPrimary,
       );

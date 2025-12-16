@@ -3,10 +3,12 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
 import 'block_component.dart';
+import '../behaviors/wobble_behavior.dart';
 
 class TowerComponent extends Component with HasGameReference {
   final List<BlockComponent> blocks = [];
   late RectangleComponent baseComponent;
+  late WobbleBehavior wobbleBehavior;
 
   // Tower physics
   double _swayAngle = 0; // Current sway angle in radians
@@ -64,6 +66,10 @@ class TowerComponent extends Component with HasGameReference {
       paint: Paint()..color = const Color(0xFF2D3436),
     );
     add(baseComponent);
+
+    // Initialize wobble behavior
+    wobbleBehavior = WobbleBehavior(blocks: blocks);
+    add(wobbleBehavior);
   }
 
   @override
@@ -181,6 +187,15 @@ class TowerComponent extends Component with HasGameReference {
       final excessOffset = absOffset - AppConstants.goodThreshold;
       final direction = placementOffset > 0 ? 1.0 : -1.0;
       _swayVelocity += direction * excessOffset * swayImpactFactor * blocks.length;
+
+      // Trigger wobble animation on imperfect drops
+      // Wobble intensity is proportional to how bad the placement was
+      final wobbleIntensity = (excessOffset / AppConstants.blockWidth) * AppConstants.maxWobbleAngle;
+      wobbleBehavior.triggerWobble(wobbleIntensity);
+    } else if (absOffset > AppConstants.perfectThreshold) {
+      // Good but not perfect - slight wobble
+      final wobbleIntensity = (absOffset / AppConstants.goodThreshold) * 3.0; // Max 3 degrees
+      wobbleBehavior.triggerWobble(wobbleIntensity);
     }
 
     // Scroll view if tower is getting tall
@@ -227,6 +242,9 @@ class TowerComponent extends Component with HasGameReference {
     _scrollOffset = 0;
     _targetScrollOffset = 0;
     _currentVisualOffset = 0;
+
+    // Reset wobble
+    wobbleBehavior.reset();
 
     // Reset base position (full width platform)
     _baseX = game.size.x / 2;

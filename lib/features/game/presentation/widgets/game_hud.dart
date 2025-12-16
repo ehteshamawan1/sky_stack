@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -21,99 +22,116 @@ class GameHUD extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            // Score and Population
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Score
-                Text(
-                  'SCORE',
-                  style: AppTextStyles.hudLabel,
-                ),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  transitionBuilder: (child, animation) {
-                    return ScaleTransition(scale: animation, child: child);
-                  },
-                  child: Text(
-                    score.toString(),
-                    key: ValueKey(score),
-                    style: AppTextStyles.hudValue,
+            // Left side: Score and Population
+            Positioned(
+              left: 0,
+              top: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Score
+                  Text(
+                    'SCORE',
+                    style: AppTextStyles.hudLabel,
                   ),
-                ),
-                const SizedBox(height: 8),
-                // Population
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.people,
-                      color: AppColors.textSecondary,
-                      size: 16,
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: Text(
+                      score.toString(),
+                      key: ValueKey(score),
+                      style: AppTextStyles.hudValue,
                     ),
-                    const SizedBox(width: 4),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      transitionBuilder: (child, animation) {
-                        return ScaleTransition(scale: animation, child: child);
-                      },
-                      child: Text(
-                        population.toString(),
-                        key: ValueKey(population),
-                        style: AppTextStyles.hudLabel.copyWith(
-                          fontSize: 16,
-                          color: AppColors.textPrimary,
+                  ),
+                  const SizedBox(height: 8),
+                  // Population
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/svg/ui/icon_person.svg',
+                        width: 18,
+                        height: 18,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.textSecondary,
+                          BlendMode.srcIn,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 4),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        transitionBuilder: (child, animation) {
+                          return ScaleTransition(scale: animation, child: child);
+                        },
+                        child: Text(
+                          population.toString(),
+                          key: ValueKey(population),
+                          style: AppTextStyles.hudLabel.copyWith(
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
-            // Combo indicator
+            // Center: Combo indicator (absolutely positioned)
             if (combo > 0)
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.5),
-                      blurRadius: 10,
-                      spreadRadius: 2,
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                child: Center(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                  ],
-                ),
-                child: Text(
-                  'COMBO x$combo',
-                  style: AppTextStyles.comboText,
+                    decoration: BoxDecoration(
+                      color: AppColors.accent,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.5),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      'COMBO x$combo',
+                      style: AppTextStyles.comboText,
+                    ),
+                  ),
                 ),
               ),
 
-            // Pause button
-            IconButton(
-              onPressed: onPause,
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.pause,
-                  color: AppColors.textPrimary,
-                  size: 28,
+            // Right side: Pause button
+            Positioned(
+              right: 0,
+              top: 0,
+              child: GestureDetector(
+                onTap: onPause,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/svg/ui/btn_pause.svg',
+                    width: 28,
+                    height: 28,
+                  ),
                 ),
               ),
             ),
