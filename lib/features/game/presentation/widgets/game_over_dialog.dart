@@ -5,6 +5,7 @@ import '../../../../core/theme/app_text_styles.dart';
 class GameOverDialog extends StatelessWidget {
   final int score;
   final int blocksPlaced;
+  final int population;
   final int? highScore;
   final bool isNewHighScore;
   final VoidCallback onRestart;
@@ -14,6 +15,7 @@ class GameOverDialog extends StatelessWidget {
     super.key,
     required this.score,
     required this.blocksPlaced,
+    required this.population,
     this.highScore,
     this.isNewHighScore = false,
     required this.onRestart,
@@ -86,6 +88,25 @@ class GameOverDialog extends StatelessWidget {
                 Text(
                   blocksPlaced.toString(),
                   style: AppTextStyles.scoreLarge,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Population
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.people,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'POPULATION: $population',
+                      style: AppTextStyles.hudLabel,
+                    ),
+                  ],
                 ),
 
                 if (highScore != null) ...[

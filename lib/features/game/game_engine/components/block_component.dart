@@ -15,6 +15,7 @@ class BlockComponent extends PositionComponent with HasGameReference {
   CraneComponent? attachedCrane;
   double fallVelocity = 0;
   double remainingWidth;
+  double placementOffset = 0; // How far off-center this block was placed
 
   Function(BlockComponent, double)? onLandedCallback;
   Function(BlockComponent)? onFellCallback;
@@ -42,21 +43,28 @@ class BlockComponent extends PositionComponent with HasGameReference {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Block visual (colored rectangle with gradient effect)
-    blockVisual = RectangleComponent(
-      size: Vector2(initialWidth, initialHeight),
-      position: Vector2(-initialWidth / 2, -initialHeight / 2),
-      paint: Paint()..color = color,
-    );
-    add(blockVisual);
+    // Don't add child visuals - we'll render directly in this component
+    // This avoids any confusion with child positioning
+  }
 
-    // Highlight on top
-    highlightVisual = RectangleComponent(
-      size: Vector2(initialWidth, initialHeight * 0.2),
-      position: Vector2(-initialWidth / 2, -initialHeight / 2),
-      paint: Paint()..color = Colors.white.withValues(alpha: 0.3),
+  @override
+  void render(Canvas canvas) {
+    // Draw block directly without child components
+    // With Anchor.center in Flame, (0,0) is at top-left of component bounds
+    // So draw from (0,0) to fill the component area correctly
+    final rect = Rect.fromLTWH(0, 0, initialWidth, initialHeight);
+
+    // Main block color
+    canvas.drawRect(rect, Paint()..color = color);
+
+    // Highlight on top (top 20% of block)
+    final highlightRect = Rect.fromLTWH(
+      0,
+      0,
+      initialWidth,
+      initialHeight * 0.2,
     );
-    add(highlightVisual);
+    canvas.drawRect(highlightRect, Paint()..color = Colors.white.withOpacity(0.3));
   }
 
   void attachToCrane(CraneComponent crane) {
@@ -108,46 +116,12 @@ class BlockComponent extends PositionComponent with HasGameReference {
     }
   }
 
-  void land(double targetY, double offset) {
+  void land(double targetY) {
     state = BlockState.landed;
     position.y = targetY;
     fallVelocity = 0;
 
-    // Trim overhanging portion
-    if (offset.abs() > AppConstants.perfectThreshold) {
-      final overhang = offset.abs();
-      final newWidth = remainingWidth - overhang;
-
-      if (newWidth <= 10) {
-        // Block mostly missed - will fall
-        remainingWidth = 0;
-        onFellCallback?.call(this);
-        removeFromParent();
-        return;
-      }
-
-      remainingWidth = newWidth;
-
-      // Update visuals
-      blockVisual.size = Vector2(remainingWidth, initialHeight);
-      highlightVisual.size = Vector2(remainingWidth, initialHeight * 0.2);
-
-      // Adjust position to center the remaining block
-      if (offset > 0) {
-        // Overhang was on the right
-        blockVisual.position = Vector2(-remainingWidth / 2, -initialHeight / 2);
-        highlightVisual.position = Vector2(-remainingWidth / 2, -initialHeight / 2);
-        position.x -= overhang / 2;
-      } else {
-        // Overhang was on the left
-        blockVisual.position = Vector2(-remainingWidth / 2, -initialHeight / 2);
-        highlightVisual.position = Vector2(-remainingWidth / 2, -initialHeight / 2);
-        position.x += overhang / 2;
-      }
-
-      size = Vector2(remainingWidth, initialHeight);
-    }
-
-    onLandedCallback?.call(this, offset);
+    // The horizontal position stays where it landed (offset from center adds to tower lean)
+    onLandedCallback?.call(this, position.x);
   }
 }

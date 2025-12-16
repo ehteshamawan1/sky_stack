@@ -18,8 +18,9 @@ class ScoringSystem {
         break;
     }
 
-    // Apply combo multiplier
-    final multiplier = 1 + (combo * AppConstants.comboMultiplier);
-    return (baseScore * multiplier).round();
+    // Apply combo multiplier (1x to 10x based on combo level)
+    // Combo 0 = 1x, Combo 1 = 2x, ... Combo 9+ = 10x
+    final multiplier = (combo + 1).clamp(1, AppConstants.maxCombo);
+    return baseScore * multiplier;
   }
 }

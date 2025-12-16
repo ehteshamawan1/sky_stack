@@ -1,19 +1,20 @@
 class AppConstants {
   // Game Physics
   static const double gravity = 980.0;
-  static const double swingSpeed = 3.0;
+  static const double swingSpeed = 2.0; // Swing speed
   static const double dropSpeed = 800.0;
   static const double wobbleDecay = 0.95;
   static const double maxWobbleAngle = 15.0; // degrees
 
-  // Block Dimensions
-  static const double blockWidth = 80.0;
-  static const double blockHeight = 40.0;
-  static const double perfectThreshold = 5.0; // pixels
-  static const double goodThreshold = 15.0;
+  // Block Dimensions - square blocks like building floors
+  static const double blockWidth = 100.0;
+  static const double blockHeight = 100.0;  // Square blocks
+  static const double perfectThreshold = 2.0; // pixels - very precise!
+  static const double comboThreshold = 8.0; // pixels - good enough for combo
+  static const double goodThreshold = 20.0; // pixels
 
   // Scoring
-  static const int perfectScore = 100;
+  static const int perfectScore = 200; // Double points for perfect
   static const int goodScore = 50;
   static const int badScore = 25;
   static const double comboMultiplier = 0.5; // +50% per combo level
@@ -21,8 +22,8 @@ class AppConstants {
 
   // Game Settings
   static const int startingLives = 3;
-  static const double craneHeight = 100.0;
-  static const double baseY = 50.0; // from bottom
+  static const double craneHeight = 100.0; // Pivot point Y position from top
+  static const double baseY = 60.0; // Platform height from bottom (road/floor)
 
   // Animation Durations
   static const Duration dropDuration = Duration(milliseconds: 300);

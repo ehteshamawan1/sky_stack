@@ -3,27 +3,32 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
 
-class CraneComponent extends PositionComponent with HasGameReference {
-  final double gameWidth;
-  double swingAngle = 0;
+class CraneComponent extends Component with HasGameReference {
+  double swingAngle = 0; // Current angle in radians (0 = straight down)
   double swingDirection = 1;
   double _speedMultiplier = 1.0;
 
-  // Visual elements
-  late RectangleComponent armComponent;
-  late RectangleComponent ropeComponent;
-  late RectangleComponent hookComponent;
+  // Pendulum parameters
+  double ropeLength = 150.0; // Length of the rope
+  double maxSwingAngle = pi / 2.5; // ~72 degrees max swing (full screen width)
+
+  // Pivot point (top center where rope attaches) - in game coordinates
+  Vector2 pivotPoint;
+  final double _pivotY;
 
   CraneComponent({
     required Vector2 position,
-    required this.gameWidth,
-  }) : super(position: position);
+    required double gameWidth,
+  }) : _pivotY = position.y,
+       pivotPoint = Vector2(gameWidth / 2, position.y);
 
   Vector2 get hookPosition {
-    final swingOffset = sin(swingAngle) * (gameWidth / 2 - 60);
+    // Pendulum motion: hook swings in an arc from the pivot point
+    // X = pivotX + ropeLength * sin(angle)
+    // Y = pivotY + ropeLength * cos(angle)
     return Vector2(
-      gameWidth / 2 + swingOffset,
-      position.y + 50,
+      pivotPoint.x + ropeLength * sin(swingAngle),
+      pivotPoint.y + ropeLength * cos(swingAngle),
     );
   }
 
@@ -35,73 +40,65 @@ class CraneComponent extends PositionComponent with HasGameReference {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Crane arm (horizontal bar at top)
-    armComponent = RectangleComponent(
-      size: Vector2(gameWidth - 60, 12),
-      position: Vector2(-gameWidth / 2 + 30, -6),
-      paint: Paint()
-        ..color = const Color(0xFF7F8C8D)
-        ..style = PaintingStyle.fill,
-    );
-    add(armComponent);
+    // Set pivot point at top center of screen
+    pivotPoint = Vector2(game.size.x / 2, _pivotY);
 
-    // Vertical support
-    final support = RectangleComponent(
-      size: Vector2(16, 30),
-      position: Vector2(-8, -30),
-      paint: Paint()..color = const Color(0xFF95A5A6),
-    );
-    add(support);
+    // Shorter rope for better visuals
+    ropeLength = 150.0;
 
-    // Rope (will be updated dynamically)
-    ropeComponent = RectangleComponent(
-      size: Vector2(3, 40),
-      position: Vector2(-1.5, 6),
-      paint: Paint()..color = const Color(0xFFBDC3C7),
-    );
-    add(ropeComponent);
-
-    // Hook
-    hookComponent = RectangleComponent(
-      size: Vector2(20, 12),
-      position: Vector2(-10, 46),
-      paint: Paint()..color = const Color(0xFFE74C3C),
-    );
-    add(hookComponent);
+    // Fixed 60 degree swing angle
+    maxSwingAngle = pi / 3; // 60 degrees
   }
 
   @override
   void update(double dt) {
     super.update(dt);
 
-    // Swing back and forth
+    // Update pivot in case game size changed
+    pivotPoint = Vector2(game.size.x / 2, _pivotY);
+
+    // Swing back and forth (pendulum motion)
     swingAngle += AppConstants.swingSpeed * dt * swingDirection * _speedMultiplier;
 
     // Reverse direction at edges
-    final maxAngle = pi / 3; // 60 degrees
-    if (swingAngle.abs() >= maxAngle) {
-      swingDirection *= -1;
-      swingAngle = swingAngle.clamp(-maxAngle, maxAngle);
+    if (swingAngle >= maxSwingAngle) {
+      swingDirection = -1;
+      swingAngle = maxSwingAngle;
+    } else if (swingAngle <= -maxSwingAngle) {
+      swingDirection = 1;
+      swingAngle = -maxSwingAngle;
     }
+  }
 
-    // Update rope and hook positions based on swing
-    final hookPos = hookPosition;
-    final ropeStartX = gameWidth / 2;
-    final ropeEndX = hookPos.x;
+  @override
+  void render(Canvas canvas) {
+    final hook = hookPosition;
 
-    // Update rope angle and position
-    final ropeLength = 40.0;
-    final angle = atan2(ropeEndX - ropeStartX, ropeLength);
-    ropeComponent.angle = angle;
-    ropeComponent.position = Vector2(
-      ropeEndX - ropeStartX - 1.5,
-      6,
+    // Draw pivot/pulley at top center
+    final pivotPaint = Paint()..color = const Color(0xFF7F8C8D);
+    canvas.drawCircle(
+      Offset(pivotPoint.x, pivotPoint.y),
+      12,
+      pivotPaint,
     );
 
-    // Update hook position
-    hookComponent.position = Vector2(
-      ropeEndX - ropeStartX - 10,
-      46,
+    // Draw rope from pivot to hook
+    final ropePaint = Paint()
+      ..color = const Color(0xFF95A5A6)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(
+      Offset(pivotPoint.x, pivotPoint.y),
+      Offset(hook.x, hook.y),
+      ropePaint,
+    );
+
+    // Draw small hook connector at end of rope
+    final hookPaint = Paint()..color = const Color(0xFFE67E22);
+    canvas.drawCircle(
+      Offset(hook.x, hook.y),
+      8,
+      hookPaint,
     );
   }
 }

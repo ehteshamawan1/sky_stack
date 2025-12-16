@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -7,49 +8,180 @@ class TowerComponent extends Component with HasGameReference {
   final List<BlockComponent> blocks = [];
   late RectangleComponent baseComponent;
 
+  // Tower physics
+  double _swayAngle = 0; // Current sway angle in radians
+  double _swayVelocity = 0; // Angular velocity
+  double _baseX = 0; // Base center X position
+  double _scrollOffset = 0; // Total amount scrolled up
+
+  // Smooth scrolling
+  double _targetScrollOffset = 0; // Where we want to scroll to
+  double _currentVisualOffset = 0; // Current visual offset (smoothly interpolated)
+
+  // Track last known game size to detect changes
+  Vector2 _lastGameSize = Vector2.zero();
+
+  // Constants for sway physics
+  static const double swayDamping = 0.99; // How quickly sway reduces (higher = longer sway)
+  static const double swayStiffness = 2.0; // How quickly tower tries to return to center
+  static const double swayImpactFactor = 0.008; // How much each offset pixel affects sway
+  static const double maxSwayPixels = 100.0; // Max visual sway in pixels for top block
+  static const double baseHeight = 20.0; // Height of the base platform
+
   double get towerHeight {
     return blocks.length * AppConstants.blockHeight;
   }
 
   double get topY {
     if (blocks.isEmpty) {
-      return game.size.y - AppConstants.baseY;
+      // First block lands on top of the base platform
+      // baseY is distance from bottom, so platform top is at game.size.y - baseY
+      return game.size.y - AppConstants.baseY + _scrollOffset;
     }
-    return game.size.y - AppConstants.baseY - towerHeight;
+    // For subsequent blocks, land on top of the tower
+    // Tower top is platform top minus total tower height
+    return game.size.y - AppConstants.baseY - towerHeight + _scrollOffset;
   }
 
   double get topBlockCenterX {
     if (blocks.isEmpty) {
-      return game.size.x / 2;
+      return _baseX;
     }
+    // Top block position is affected by tower sway
     return blocks.last.position.x;
-  }
-
-  double get topBlockWidth {
-    if (blocks.isEmpty) {
-      return AppConstants.blockWidth;
-    }
-    return blocks.last.remainingWidth;
   }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // Create base platform
+    _baseX = game.size.x / 2;
+
+    // Create base platform (full screen width - road/floor)
     baseComponent = RectangleComponent(
-      size: Vector2(AppConstants.blockWidth + 40, 20),
-      position: Vector2(
-        game.size.x / 2 - (AppConstants.blockWidth + 40) / 2,
-        game.size.y - AppConstants.baseY,
-      ),
+      size: Vector2(game.size.x, AppConstants.baseY),
+      position: Vector2(0, game.size.y - AppConstants.baseY),
       paint: Paint()..color = const Color(0xFF2D3436),
     );
     add(baseComponent);
   }
 
-  void addBlock(BlockComponent block) {
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    // Always keep base position synchronized with current game size
+    // This handles cases where game.size changes after onLoad
+    final expectedBaseY = game.size.y - AppConstants.baseY + _currentVisualOffset;
+    if (baseComponent.position.y != expectedBaseY ||
+        baseComponent.size.x != game.size.x ||
+        _lastGameSize.x != game.size.x ||
+        _lastGameSize.y != game.size.y) {
+      _lastGameSize = game.size.clone();
+      _updateBasePosition();
+    }
+
+    // Smooth scroll animation
+    if (_currentVisualOffset != _targetScrollOffset) {
+      final diff = _targetScrollOffset - _currentVisualOffset;
+      final scrollSpeed = 200.0; // pixels per second
+      final step = scrollSpeed * dt;
+
+      if (diff.abs() <= step) {
+        _currentVisualOffset = _targetScrollOffset;
+      } else {
+        _currentVisualOffset += diff.sign * step;
+      }
+
+      // Apply visual offset to all blocks
+      _applyScrollOffset();
+    }
+
+    if (blocks.isEmpty) return;
+
+    // Apply spring physics to sway (tower tries to return to vertical)
+    _swayVelocity -= _swayAngle * swayStiffness * dt;
+    _swayVelocity *= swayDamping;
+    _swayAngle += _swayVelocity * dt;
+
+    // Update block positions based on sway
+    _updateBlockPositions();
+  }
+
+  void _updateBasePosition() {
+    // Update base component to match current game size
+    _baseX = game.size.x / 2;
+    baseComponent.size = Vector2(game.size.x, AppConstants.baseY);
+    baseComponent.position = Vector2(0, game.size.y - AppConstants.baseY + _currentVisualOffset);
+
+    // Also update all block positions to match new game size
+    _applyScrollOffset();
+  }
+
+  void _applyScrollOffset() {
+    // Update block Y positions based on current visual offset (Anchor.center)
+    for (int i = 0; i < blocks.length; i++) {
+      final blockCenterY = game.size.y - AppConstants.baseY - (i + 1) * AppConstants.blockHeight + AppConstants.blockHeight / 2;
+      blocks[i].position.y = blockCenterY + _currentVisualOffset;
+    }
+
+    // Update base position
+    baseComponent.position.y = game.size.y - AppConstants.baseY + _currentVisualOffset;
+  }
+
+  void _updateBlockPositions() {
+    // Only apply sway to top 5 blocks for stability
+    // Lower blocks remain stable
+    const int swayBlockCount = 5;
+    final int startSwayIndex = (blocks.length - swayBlockCount).clamp(0, blocks.length);
+
+    for (int i = 0; i < blocks.length; i++) {
+      final block = blocks[i];
+
+      double swayOffset = 0;
+      if (i >= startSwayIndex) {
+        // Calculate sway only for top blocks
+        // Sway increases for higher blocks within the sway range
+        final swayPosition = i - startSwayIndex + 1; // 1 to 5
+        final swayFactor = swayPosition / swayBlockCount; // 0.2 to 1.0
+        swayOffset = sin(_swayAngle) * swayFactor * maxSwayPixels; // Max sway in pixels
+      }
+
+      block.position.x = _baseX + swayOffset + _getBlockOffset(i);
+    }
+  }
+
+  // Get the cumulative offset for a block (how off-center it was placed)
+  double _getBlockOffset(int index) {
+    double offset = 0;
+    for (int i = 0; i <= index && i < blocks.length; i++) {
+      // Each block adds its placement offset
+      offset += blocks[i].placementOffset;
+    }
+    return offset;
+  }
+
+  /// Add a block to the tower and apply impact to sway
+  void addBlock(BlockComponent block, double placementOffset) {
+    // Store the offset from where it should have been placed
+    block.placementOffset = placementOffset;
     blocks.add(block);
+
+    // Set the correct Y position for this block (Anchor.center)
+    // Block center should be at: platformTop - (index+1)*blockHeight + blockHeight/2
+    final blockIndex = blocks.length - 1;
+    final blockCenterY = game.size.y - AppConstants.baseY - (blockIndex + 1) * AppConstants.blockHeight + AppConstants.blockHeight / 2;
+    block.position.y = blockCenterY + _currentVisualOffset;
+
+    // Only apply sway impact for BAD placements (beyond good threshold)
+    // Perfect and good placements keep the tower stable
+    final absOffset = placementOffset.abs();
+    if (absOffset > AppConstants.goodThreshold) {
+      // Bad placement - apply sway based on how far off it was
+      final excessOffset = absOffset - AppConstants.goodThreshold;
+      final direction = placementOffset > 0 ? 1.0 : -1.0;
+      _swayVelocity += direction * excessOffset * swayImpactFactor * blocks.length;
+    }
 
     // Scroll view if tower is getting tall
     if (towerHeight > game.size.y * 0.5) {
@@ -57,16 +189,30 @@ class TowerComponent extends Component with HasGameReference {
     }
   }
 
+  /// Check if tower has toppled over
+  bool hasToppled() {
+    // Need at least 5 blocks for topple to be possible
+    if (blocks.length < 5) return false;
+
+    // Calculate the visual displacement of the top block from sway
+    // For top block, swayFactor = 1.0, so max offset = sin(_swayAngle) * maxSwayPixels
+    final topBlockSwayOffset = sin(_swayAngle).abs() * maxSwayPixels;
+
+    // Tower topples if the top block has swayed more than 80% of block width
+    // This means the block visually looks like it's about to fall off
+    final toppleThreshold = AppConstants.blockWidth * 0.8;
+
+    return topBlockSwayOffset > toppleThreshold;
+  }
+
   void scrollUp() {
     final scrollAmount = AppConstants.blockHeight;
 
-    // Move all blocks down visually (camera scrolls up)
-    for (final block in blocks) {
-      block.position.y += scrollAmount;
-    }
+    // Track total scroll offset (for collision calculations)
+    _scrollOffset += scrollAmount;
 
-    // Move base down too
-    baseComponent.position.y += scrollAmount;
+    // Set target for smooth scrolling animation
+    _targetScrollOffset += scrollAmount;
   }
 
   void clear() {
@@ -75,31 +221,52 @@ class TowerComponent extends Component with HasGameReference {
     }
     blocks.clear();
 
-    // Reset base position
-    baseComponent.position = Vector2(
-      game.size.x / 2 - (AppConstants.blockWidth + 40) / 2,
-      game.size.y - AppConstants.baseY,
-    );
+    // Reset sway
+    _swayAngle = 0;
+    _swayVelocity = 0;
+    _scrollOffset = 0;
+    _targetScrollOffset = 0;
+    _currentVisualOffset = 0;
+
+    // Reset base position (full width platform)
+    _baseX = game.size.x / 2;
+    baseComponent.size = Vector2(game.size.x, AppConstants.baseY);
+    baseComponent.position = Vector2(0, game.size.y - AppConstants.baseY);
+
+    // Reset last game size to force update on next frame
+    _lastGameSize = game.size.clone();
   }
 
   /// Check if a falling block should land on the tower
-  /// Returns (shouldLand, targetY, horizontalOffset)
-  (bool, double, double) checkCollision(BlockComponent fallingBlock) {
+  /// Returns (shouldLand, targetY) where targetY is where the block's CENTER should be
+  (bool, double) checkCollision(BlockComponent fallingBlock) {
+    // With Anchor.center, we need to calculate bottom from center
     final blockBottom = fallingBlock.position.y + fallingBlock.initialHeight / 2;
-    final targetY = topY - fallingBlock.initialHeight / 2;
+    final targetCenterY = topY - fallingBlock.initialHeight / 2;
 
-    if (blockBottom >= targetY) {
-      // Calculate horizontal offset from center of top block (or base)
-      final offset = fallingBlock.position.x - topBlockCenterX;
+    if (blockBottom >= topY) {
+      // Check if block overlaps with the top of tower (or base)
+      final topX = topBlockCenterX;
+      // First block can land anywhere on the full-width platform
+      // Subsequent blocks need to overlap with the previous block
+      final topWidth = blocks.isEmpty ? game.size.x : AppConstants.blockWidth;
+      final fallingX = fallingBlock.position.x;
+      final fallingWidth = fallingBlock.initialWidth;
 
-      // Check if block is within bounds (allowing some overhang)
-      final maxOffset = (topBlockWidth / 2) + (fallingBlock.remainingWidth / 2);
+      // Check horizontal overlap
+      final topLeft = topX - topWidth / 2;
+      final topRight = topX + topWidth / 2;
+      final fallingLeft = fallingX - fallingWidth / 2;
+      final fallingRight = fallingX + fallingWidth / 2;
 
-      if (offset.abs() <= maxOffset) {
-        return (true, targetY, offset);
+      // There's overlap if the ranges intersect
+      final hasOverlap = fallingLeft < topRight && fallingRight > topLeft;
+
+      if (hasOverlap) {
+        return (true, targetCenterY);
       }
     }
 
-    return (false, 0, 0);
+    return (false, 0);
   }
 }
