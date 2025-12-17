@@ -10,7 +10,7 @@ class AppConstants {
   static const double blockWidth = 100.0;
   static const double blockHeight = 100.0;  // Square blocks
   static const double perfectThreshold = 2.0; // pixels - very precise!
-  static const double comboThreshold = 8.0; // pixels - good enough for combo
+  static const double comboThreshold = 5.0; // pixels - good enough for combo
   static const double goodThreshold = 20.0; // pixels
 
   // Scoring
@@ -21,7 +21,6 @@ class AppConstants {
   static const int maxCombo = 10;
 
   // Game Settings
-  static const int startingLives = 3;
   static const double craneHeight = 100.0; // Pivot point Y position from top
   static const double baseY = 60.0; // Platform height from bottom (road/floor)
 

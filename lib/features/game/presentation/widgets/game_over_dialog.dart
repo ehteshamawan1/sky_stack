@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -10,8 +9,11 @@ class GameOverDialog extends StatelessWidget {
   final int population;
   final int? highScore;
   final bool isNewHighScore;
+  final bool canContinue;
+  final bool isAdLoading;
   final VoidCallback onRestart;
   final VoidCallback onExit;
+  final VoidCallback? onContinue;
 
   const GameOverDialog({
     super.key,
@@ -20,8 +22,11 @@ class GameOverDialog extends StatelessWidget {
     required this.population,
     this.highScore,
     this.isNewHighScore = false,
+    this.canContinue = false,
+    this.isAdLoading = false,
     required this.onRestart,
     required this.onExit,
+    this.onContinue,
   });
 
   @override
@@ -185,6 +190,94 @@ class GameOverDialog extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 24),
+
+                      // Continue Button (Watch Ad)
+                      if (canContinue && onContinue != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: isAdLoading ? null : onContinue,
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.goldGradient,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.perfect.withOpacity(0.4),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (isAdLoading)
+                                        const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
+                                        )
+                                      else
+                                        const Icon(
+                                          Icons.play_circle_outline,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        isAdLoading ? 'Loading...' : 'Continue',
+                                        style: AppTextStyles.buttonMedium.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      if (!isAdLoading) ...[
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.videocam_rounded,
+                                                color: Colors.white,
+                                                size: 14,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                'AD',
+                                                style: AppTextStyles.hudLabel.copyWith(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
 
                       // Play Again Button
                       SizedBox(

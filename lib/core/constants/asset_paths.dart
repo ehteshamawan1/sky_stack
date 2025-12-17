@@ -63,8 +63,14 @@ class AssetPaths {
   static const String sfxLevelUp = '$sfxBase/level_up.wav';
 
   // Music paths
-  static const String musicMenu = '$musicBase/menu_theme.mp3';
-  static const String musicGame1 = '$musicBase/game_theme_1.mp3';
-  static const String musicGame2 = '$musicBase/game_theme_2.mp3';
-  static const String musicVictory = '$musicBase/victory.mp3';
+  static const String musicMenu = '$musicBase/menu_theme.wav';
+  static const String musicVictory = '$musicBase/victory.wav';
+
+  // Theme-specific music
+  static String musicTheme(String theme) => '$musicBase/${theme}_theme.wav';
+  static const String musicCity = '$musicBase/city_theme.wav';
+  static const String musicDesert = '$musicBase/desert_theme.wav';
+  static const String musicUnderwater = '$musicBase/underwater_theme.wav';
+  static const String musicSpace = '$musicBase/space_theme.wav';
+  static const String musicFantasy = '$musicBase/fantasy_theme.wav';
 }

@@ -43,6 +43,10 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   Function(int)? onPopulationUpdate;
   Function()? onGameOver;
   Function()? onPerfectPlacement;
+  Function()? onGameStart;
+  Function()? onBlockDrop;
+  Function(int quality)? onBlockLand; // 0=bad, 1=good, 2=perfect
+  Function()? onBlockFall;
 
   // Block color index for variety
   int _colorIndex = 0;
@@ -103,6 +107,7 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   void onTapDown(TapDownEvent event) {
     if (gameState == GameState.ready) {
       gameState = GameState.playing;
+      onGameStart?.call();
     }
 
     if (gameState == GameState.playing && currentBlock != null) {
@@ -112,6 +117,9 @@ class SkyStackGame extends FlameGame with TapCallbacks {
 
   void dropBlock() {
     if (currentBlock == null) return;
+
+    // Notify UI that block was dropped
+    onBlockDrop?.call();
 
     currentBlock!.drop(
       onLanded: handleBlockLanded,
@@ -184,12 +192,15 @@ class SkyStackGame extends FlameGame with TapCallbacks {
       quality = PlacementQuality.perfect;
       // Trigger perfect placement indicator
       onPerfectPlacement?.call();
+      onBlockLand?.call(2); // 2 = perfect
       // Add golden sparkle effect for perfect placement
       add(ParticleEffects.perfectDropEffect(block.position));
     } else if (absOffset <= AppConstants.goodThreshold) {
       quality = PlacementQuality.good;
+      onBlockLand?.call(1); // 1 = good
     } else {
       quality = PlacementQuality.bad;
+      onBlockLand?.call(0); // 0 = bad
       // Screen shake for bad placement
       triggerScreenShake(intensity: 6, duration: 0.25);
     }
@@ -304,6 +315,9 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     // Block fell off - game over
     combo = comboSystem.resetCombo();
     onComboUpdate?.call(combo);
+
+    // Notify UI that block fell
+    onBlockFall?.call();
 
     currentBlock = null;
     gameState = GameState.gameOver;

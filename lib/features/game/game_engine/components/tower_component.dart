@@ -24,11 +24,14 @@ class TowerComponent extends Component with HasGameReference {
   Vector2 _lastGameSize = Vector2.zero();
 
   // Constants for sway physics
-  static const double swayDamping = 0.99; // How quickly sway reduces (higher = longer sway)
-  static const double swayStiffness = 2.0; // How quickly tower tries to return to center
-  static const double swayImpactFactor = 0.008; // How much each offset pixel affects sway
-  static const double maxSwayPixels = 100.0; // Max visual sway in pixels for top block
+  static const double swayDamping = 0.98; // How quickly sway reduces (lower = faster decay)
+  static const double swayStiffness = 3.0; // How quickly tower tries to return to center
+  static const double swayImpactFactor = 0.015; // How much each offset pixel affects sway
+  static const double maxSwayPixels = 80.0; // Max visual sway in pixels for top block
   static const double baseHeight = 20.0; // Height of the base platform
+
+  // Topple detection
+  double _cumulativeOffset = 0; // Total offset from all block placements
 
   double get towerHeight {
     return blocks.length * AppConstants.blockHeight;
@@ -173,28 +176,39 @@ class TowerComponent extends Component with HasGameReference {
     block.placementOffset = placementOffset;
     blocks.add(block);
 
+    // Track cumulative offset for topple detection
+    _cumulativeOffset += placementOffset;
+
     // Set the correct Y position for this block (Anchor.center)
     // Block center should be at: platformTop - (index+1)*blockHeight + blockHeight/2
     final blockIndex = blocks.length - 1;
     final blockCenterY = game.size.y - AppConstants.baseY - (blockIndex + 1) * AppConstants.blockHeight + AppConstants.blockHeight / 2;
     block.position.y = blockCenterY + _currentVisualOffset;
 
-    // Only apply sway impact for BAD placements (beyond good threshold)
-    // Perfect and good placements keep the tower stable
+    // Apply sway based on placement quality
     final absOffset = placementOffset.abs();
     if (absOffset > AppConstants.goodThreshold) {
-      // Bad placement - apply sway based on how far off it was
+      // Bad placement - significant sway
       final excessOffset = absOffset - AppConstants.goodThreshold;
       final direction = placementOffset > 0 ? 1.0 : -1.0;
-      _swayVelocity += direction * excessOffset * swayImpactFactor * blocks.length;
+      // More aggressive sway for taller towers
+      final heightFactor = 1.0 + (blocks.length * 0.1);
+      _swayVelocity += direction * excessOffset * swayImpactFactor * heightFactor;
 
-      // Trigger wobble animation on imperfect drops
-      // Wobble intensity is proportional to how bad the placement was
+      // Trigger wobble animation
       final wobbleIntensity = (excessOffset / AppConstants.blockWidth) * AppConstants.maxWobbleAngle;
       wobbleBehavior.triggerWobble(wobbleIntensity);
+    } else if (absOffset > AppConstants.comboThreshold) {
+      // Mediocre placement - some sway
+      final direction = placementOffset > 0 ? 1.0 : -1.0;
+      _swayVelocity += direction * absOffset * swayImpactFactor * 0.5;
+
+      // Slight wobble
+      final wobbleIntensity = (absOffset / AppConstants.goodThreshold) * 5.0;
+      wobbleBehavior.triggerWobble(wobbleIntensity);
     } else if (absOffset > AppConstants.perfectThreshold) {
-      // Good but not perfect - slight wobble
-      final wobbleIntensity = (absOffset / AppConstants.goodThreshold) * 3.0; // Max 3 degrees
+      // Good but not perfect - slight wobble only
+      final wobbleIntensity = (absOffset / AppConstants.goodThreshold) * 3.0;
       wobbleBehavior.triggerWobble(wobbleIntensity);
     }
 
@@ -206,18 +220,27 @@ class TowerComponent extends Component with HasGameReference {
 
   /// Check if tower has toppled over
   bool hasToppled() {
-    // Need at least 5 blocks for topple to be possible
-    if (blocks.length < 5) return false;
+    // Need at least 3 blocks for topple to be possible
+    if (blocks.length < 3) return false;
 
     // Calculate the visual displacement of the top block from sway
-    // For top block, swayFactor = 1.0, so max offset = sin(_swayAngle) * maxSwayPixels
     final topBlockSwayOffset = sin(_swayAngle).abs() * maxSwayPixels;
 
-    // Tower topples if the top block has swayed more than 80% of block width
-    // This means the block visually looks like it's about to fall off
-    final toppleThreshold = AppConstants.blockWidth * 0.8;
+    // Also consider cumulative offset - if blocks are stacked too far off-center
+    final absCumulativeOffset = _cumulativeOffset.abs();
 
-    return topBlockSwayOffset > toppleThreshold;
+    // Tower height factor - taller towers are more unstable
+    final heightInstability = blocks.length * 2.0;
+
+    // Combined instability from sway and cumulative offset
+    // Sway contributes directly, cumulative offset contributes based on tower height
+    final totalInstability = topBlockSwayOffset + (absCumulativeOffset * blocks.length * 0.05);
+
+    // Topple threshold scales slightly with height (taller = slightly more forgiving visually)
+    // but cumulative offset becomes more dangerous
+    final toppleThreshold = AppConstants.blockWidth * 0.6 + heightInstability;
+
+    return totalInstability > toppleThreshold;
   }
 
   void scrollUp() {
@@ -242,6 +265,7 @@ class TowerComponent extends Component with HasGameReference {
     _scrollOffset = 0;
     _targetScrollOffset = 0;
     _currentVisualOffset = 0;
+    _cumulativeOffset = 0;
 
     // Reset wobble
     wobbleBehavior.reset();

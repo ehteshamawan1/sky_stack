@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/providers/player_data_provider.dart';
+import '../../../../core/services/asset_preloader.dart';
+import '../../../../core/services/audio_service.dart';
 import '../../../../routing/routes.dart';
 import '../../../game/providers/theme_provider.dart';
+import '../../../city_builder/providers/city_provider.dart';
 import '../widgets/theme_selector_sheet.dart';
-
-const String _highScoreKey = 'high_score';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -17,40 +18,63 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
-  int _highScore = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadHighScore();
-  }
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final AssetPreloader _preloader = AssetPreloader();
+  final AudioService _audioService = AudioService();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Refresh high score when returning to this screen
-    _loadHighScore();
+    // Refresh player data when returning to this screen
+    ref.read(playerDataProvider.notifier).refresh();
+    // Preload game assets in background
+    _preloader.preloadAssets(context);
+    // Also preload the selected theme
+    final selectedTheme = ref.read(gameThemeProvider);
+    _preloader.preloadTheme(selectedTheme);
+    // Load audio settings
+    _initAudioSettings();
   }
 
-  Future<void> _loadHighScore() async {
-    final prefs = await SharedPreferences.getInstance();
-    final score = prefs.getInt(_highScoreKey) ?? 0;
-    if (mounted && score != _highScore) {
-      setState(() => _highScore = score);
+  void _initAudioSettings() {
+    final playerData = ref.read(playerDataProvider);
+    if (playerData != null) {
+      _audioService.updateSettings(
+        soundEnabled: playerData.settings.soundEnabled,
+        musicEnabled: playerData.settings.musicEnabled,
+        masterVolume: playerData.settings.masterVolume,
+        sfxVolume: playerData.settings.sfxVolume,
+        musicVolume: playerData.settings.musicVolume,
+      );
     }
   }
 
   void _navigateToGame() async {
+    _audioService.playTap();
     await Navigator.pushNamed(context, Routes.game);
-    // Refresh high score when returning from game
-    _loadHighScore();
+    // Refresh data when returning from game
+    ref.read(playerDataProvider.notifier).refresh();
+  }
+
+  void _navigateToCityBuilder() async {
+    _audioService.playTap();
+    await Navigator.pushNamed(context, Routes.cityBuilder);
+    // Refresh data when returning
+    ref.read(playerDataProvider.notifier).refresh();
+    ref.read(cityProvider.notifier).refresh();
+  }
+
+  void _navigateToProfile() {
+    _audioService.playTap();
+    Navigator.pushNamed(context, Routes.profile);
   }
 
   @override
   Widget build(BuildContext context) {
     final currentTheme = ref.watch(gameThemeProvider);
     final theme = GameTheme.all.firstWhere((t) => t.id == currentTheme);
+    final highScore = ref.watch(highScoreProvider);
+    final city = ref.watch(cityProvider);
 
     return Scaffold(
       body: Container(
@@ -98,13 +122,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
                 ),
               ),
 
+              // Profile button (top-right)
+              Positioned(
+                top: 16,
+                right: 16,
+                child: GestureDetector(
+                  onTap: _navigateToProfile,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+
               // Main content
               Center(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Spacer(flex: 2),
+                      const SizedBox(height: 40),
 
                       // App Icon with glow
                       Container(
@@ -122,16 +168,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
                         ),
                         child: SvgPicture.asset(
                           'assets/svg/ui/app_icon.svg',
-                          width: 100,
-                          height: 100,
+                          width: 80,
+                          height: 80,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
                       // Title with shadow
                       Text(
                         'SKY STACK',
                         style: AppTextStyles.gameTitle.copyWith(
+                          fontSize: 36,
                           shadows: [
                             Shadow(
                               color: Colors.black.withOpacity(0.3),
@@ -156,10 +203,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
                         ),
                       ),
 
-                      const Spacer(flex: 2),
+                      const SizedBox(height: 40),
 
-                      // Play Button
-                      _PlayButton(onPressed: _navigateToGame),
+                      // Game Mode Buttons
+                      _GameModeButton(
+                        icon: Icons.play_arrow_rounded,
+                        title: 'CLASSIC',
+                        subtitle: 'Endless stacking',
+                        gradient: AppColors.successGradient,
+                        glowColor: AppColors.secondary,
+                        onPressed: _navigateToGame,
+                        isPrimary: true,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      _GameModeButton(
+                        icon: Icons.location_city_rounded,
+                        title: 'CITY BUILDER',
+                        subtitle: city != null
+                            ? '${city.buildingsCount}/9 buildings'
+                            : 'Build your city',
+                        gradient: AppColors.accentGradient,
+                        glowColor: AppColors.accent,
+                        onPressed: _navigateToCityBuilder,
+                      ),
 
                       const SizedBox(height: 32),
 
@@ -207,7 +275,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
                                   ),
                                 ),
                                 Text(
-                                  _highScore.toString(),
+                                  highScore.toString(),
                                   style: AppTextStyles.scoreLarge.copyWith(
                                     color: Colors.white,
                                   ),
@@ -218,11 +286,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
                         ),
                       ),
 
-                      const Spacer(flex: 3),
+                      const SizedBox(height: 32),
 
                       // Theme selector button
                       GestureDetector(
                         onTap: () {
+                          _audioService.playTap();
                           showThemeSelector(context);
                         },
                         child: Container(
@@ -269,7 +338,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -282,16 +351,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with RouteAware {
   }
 }
 
-class _PlayButton extends StatefulWidget {
+class _GameModeButton extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final LinearGradient gradient;
+  final Color glowColor;
   final VoidCallback onPressed;
+  final bool isPrimary;
 
-  const _PlayButton({required this.onPressed});
+  const _GameModeButton({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.gradient,
+    required this.glowColor,
+    required this.onPressed,
+    this.isPrimary = false,
+  });
 
   @override
-  State<_PlayButton> createState() => _PlayButtonState();
+  State<_GameModeButton> createState() => _GameModeButtonState();
 }
 
-class _PlayButtonState extends State<_PlayButton>
+class _GameModeButtonState extends State<_GameModeButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -303,15 +386,19 @@ class _PlayButtonState extends State<_PlayButton>
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
-    )..repeat(reverse: true);
+    );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    _glowAnimation = Tween<double>(begin: 0.3, end: 0.6).animate(
+    _glowAnimation = Tween<double>(begin: 0.2, end: 0.5).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+
+    if (widget.isPrimary) {
+      _controller.repeat(reverse: true);
+    }
   }
 
   @override
@@ -322,6 +409,79 @@ class _PlayButtonState extends State<_PlayButton>
 
   @override
   Widget build(BuildContext context) {
+    final button = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: widget.onPressed,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 18,
+          ),
+          decoration: BoxDecoration(
+            gradient: widget.gradient,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: widget.glowColor.withOpacity(0.4),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  widget.icon,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: AppTextStyles.buttonLarge.copyWith(
+                        color: Colors.white,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.subtitle,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white.withOpacity(0.8),
+                size: 24,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (!widget.isPrimary) {
+      return button;
+    }
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -329,12 +489,12 @@ class _PlayButtonState extends State<_PlayButton>
           scale: _scaleAnimation.value,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.secondary.withOpacity(_glowAnimation.value),
+                  color: widget.glowColor.withOpacity(_glowAnimation.value),
                   blurRadius: 25,
-                  spreadRadius: 5,
+                  spreadRadius: 3,
                 ),
               ],
             ),
@@ -342,48 +502,7 @@ class _PlayButtonState extends State<_PlayButton>
           ),
         );
       },
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.onPressed,
-          borderRadius: BorderRadius.circular(50),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 64,
-              vertical: 20,
-            ),
-            decoration: BoxDecoration(
-              gradient: AppColors.successGradient,
-              borderRadius: BorderRadius.circular(50),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.secondary.withOpacity(0.4),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.play_arrow_rounded,
-                  color: Colors.white,
-                  size: 32,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'PLAY',
-                  style: AppTextStyles.buttonLarge.copyWith(
-                    color: Colors.white,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: button,
     );
   }
 }

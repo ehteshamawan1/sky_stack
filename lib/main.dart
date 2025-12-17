@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
+import 'core/services/hive_service.dart';
+import 'core/services/ad_service.dart';
+import 'core/services/audio_service.dart';
+import 'core/services/haptic_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +26,20 @@ void main() async {
     ),
   );
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  // Initialize services in parallel where possible
+  await Future.wait([
+    // Initialize Firebase
+    Firebase.initializeApp(),
+    // Initialize Hive for local storage
+    HiveService().initialize(),
+  ]);
+
+  // Initialize AdMob (can be done after app starts)
+  AdService().initialize();
+
+  // Initialize audio and haptic services
+  AudioService().initialize();
+  HapticService().initialize();
 
   runApp(
     const ProviderScope(

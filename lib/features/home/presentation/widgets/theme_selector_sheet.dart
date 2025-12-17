@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/services/audio_service.dart';
 import '../../../game/providers/theme_provider.dart';
+
+final _audioService = AudioService();
 
 class ThemeSelectorSheet extends ConsumerWidget {
   const ThemeSelectorSheet({super.key});
@@ -75,6 +78,7 @@ class ThemeSelectorSheet extends ConsumerWidget {
                 theme: theme,
                 isSelected: isSelected,
                 onTap: () {
+                  _audioService.playTap();
                   ref.read(gameThemeProvider.notifier).setTheme(theme.id);
                 },
               );
