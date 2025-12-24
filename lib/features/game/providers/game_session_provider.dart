@@ -6,7 +6,6 @@ class GameSessionState {
   final GameMode mode;
   final int score;
   final int combo;
-  final int lives;
   final int blocksPlaced;
   final int population;
   final bool isGameOver;
@@ -19,7 +18,6 @@ class GameSessionState {
     this.mode = GameMode.classic,
     this.score = 0,
     this.combo = 0,
-    this.lives = ClassicModeConfig.initialLives,
     this.blocksPlaced = 0,
     this.population = 0,
     this.isGameOver = false,
@@ -30,17 +28,12 @@ class GameSessionState {
   /// Whether the player can continue (watch ad to revive)
   bool get canContinue =>
       isGameOver &&
-      continuesUsed < ClassicModeConfig.maxContinues &&
-      lives == 0;
-
-  /// Whether the player has any lives remaining
-  bool get hasLives => lives > 0;
+      continuesUsed < ClassicModeConfig.maxContinues;
 
   GameSessionState copyWith({
     GameMode? mode,
     int? score,
     int? combo,
-    int? lives,
     int? blocksPlaced,
     int? population,
     bool? isGameOver,
@@ -51,7 +44,6 @@ class GameSessionState {
       mode: mode ?? this.mode,
       score: score ?? this.score,
       combo: combo ?? this.combo,
-      lives: lives ?? this.lives,
       blocksPlaced: blocksPlaced ?? this.blocksPlaced,
       population: population ?? this.population,
       isGameOver: isGameOver ?? this.isGameOver,
@@ -72,7 +64,6 @@ class GameSessionNotifier extends StateNotifier<GameSessionState> {
   }) {
     state = GameSessionState(
       mode: mode,
-      lives: ClassicModeConfig.initialLives,
       citySlotIndex: citySlotIndex,
     );
   }
@@ -95,31 +86,6 @@ class GameSessionNotifier extends StateNotifier<GameSessionState> {
   /// Add to population count
   void addPopulation(int count) {
     state = state.copyWith(population: state.population + count);
-  }
-
-  /// Lose a life - returns true if game should end
-  bool loseLife() {
-    final newLives = state.lives - 1;
-    if (newLives <= 0) {
-      state = state.copyWith(lives: 0, isGameOver: true);
-      return true;
-    } else {
-      state = state.copyWith(lives: newLives);
-      return false;
-    }
-  }
-
-  /// Use a continue (after watching rewarded ad)
-  /// Returns true if continue was successful
-  bool useContinue() {
-    if (!state.canContinue) return false;
-
-    state = state.copyWith(
-      lives: 1, // Give one life back
-      isGameOver: false,
-      continuesUsed: state.continuesUsed + 1,
-    );
-    return true;
   }
 
   /// End the game

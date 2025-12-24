@@ -61,7 +61,7 @@ class ScorePopupComponent extends PositionComponent {
           fontWeight: FontWeight.bold,
           shadows: [
             Shadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               offset: const Offset(2, 2),
               blurRadius: 4,
             ),
@@ -138,7 +138,7 @@ class PerfectIndicatorComponent extends PositionComponent {
           fontWeight: FontWeight.bold,
           shadows: [
             Shadow(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withValues(alpha: 0.6),
               offset: const Offset(3, 3),
               blurRadius: 6,
             ),
@@ -228,7 +228,7 @@ class ComboIndicatorComponent extends PositionComponent {
           fontWeight: FontWeight.bold,
           shadows: [
             Shadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               offset: const Offset(2, 2),
               blurRadius: 4,
             ),

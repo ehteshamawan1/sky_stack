@@ -57,6 +57,8 @@ class AssetPaths {
   static const String sfxCombo3 = '$sfxBase/combo_3.wav';
   static const String sfxPowerupPickup = '$sfxBase/powerup_pickup.wav';
   static const String sfxPowerupUse = '$sfxBase/powerup_use.wav';
+  static const String sfxWindGust = '$sfxBase/wind_gust.wav';
+  static const String sfxHazardWarning = '$sfxBase/hazard_warning.wav';
   static const String sfxTap = '$sfxBase/ui_tap.wav';
   static const String sfxBack = '$sfxBase/ui_back.wav';
   static const String sfxAchievement = '$sfxBase/achievement.wav';

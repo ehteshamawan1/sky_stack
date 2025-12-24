@@ -12,6 +12,7 @@ class AppConstants {
   static const double perfectThreshold = 2.0; // pixels - very precise!
   static const double comboThreshold = 5.0; // pixels - good enough for combo
   static const double goodThreshold = 20.0; // pixels
+  static const double minOverlapPercent = 0.2; // 20% minimum overlap to land
 
   // Scoring
   static const int perfectScore = 200; // Double points for perfect

@@ -10,6 +10,10 @@ class AdService {
   factory AdService() => _instance;
   AdService._internal();
 
+  // TODO: Set to false before publishing to Play Store
+  // This allows testing ads in release mode before AdMob approves the app
+  static const bool _useTestAdsBeforePublish = true;
+
   RewardedAd? _rewardedAd;
   bool _isRewardedAdReady = false;
 
@@ -22,9 +26,9 @@ class AdService {
     _loadRewardedAd();
   }
 
-  /// Get the rewarded ad unit ID (uses test ID in debug mode)
+  /// Get the rewarded ad unit ID (uses test ID in debug mode or pre-publish)
   String get _rewardedAdUnitId {
-    if (kDebugMode) {
+    if (kDebugMode || _useTestAdsBeforePublish) {
       // Test ad unit IDs
       if (Platform.isAndroid) {
         return 'ca-app-pub-3940256099942544/5224354917';

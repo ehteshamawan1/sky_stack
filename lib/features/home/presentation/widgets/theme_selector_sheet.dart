@@ -31,7 +31,7 @@ class ThemeSelectorSheet extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.textSecondary.withOpacity(0.3),
+                color: AppColors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -132,7 +132,7 @@ class _ThemeCard extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               _themeColor,
-              _themeColor.withOpacity(0.7),
+              _themeColor.withValues(alpha: 0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
@@ -143,7 +143,7 @@ class _ThemeCard extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.perfect.withOpacity(0.4),
+                    color: AppColors.perfect.withValues(alpha: 0.4),
                     blurRadius: 12,
                     spreadRadius: 2,
                   ),

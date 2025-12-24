@@ -19,8 +19,8 @@ class HapticService {
     if (_isInitialized) return;
 
     try {
-      _hasVibrator = await Vibration.hasVibrator() ?? false;
-      _hasAmplitudeControl = await Vibration.hasAmplitudeControl() ?? false;
+      _hasVibrator = await Vibration.hasVibrator();
+      _hasAmplitudeControl = await Vibration.hasAmplitudeControl();
       _isInitialized = true;
     } catch (e) {
       _hasVibrator = false;

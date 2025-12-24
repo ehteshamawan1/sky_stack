@@ -15,7 +15,7 @@ class SkyStackApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      initialRoute: Routes.home,
+      initialRoute: Routes.splash,
       onGenerateRoute: AppRouter.generateRoute,
     );
   }

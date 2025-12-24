@@ -37,6 +37,7 @@ class AudioService {
   double _masterVolume = 1.0;
   double _sfxVolume = 1.0;
   double _musicVolume = 0.7;
+  double _musicPlayerVolume = 0.7;
 
   // State
   bool _isInitialized = false;
@@ -89,7 +90,8 @@ class AudioService {
     if (sfxVolume != null) _sfxVolume = sfxVolume;
     if (musicVolume != null) {
       _musicVolume = musicVolume;
-      _musicPlayer?.setVolume(_effectiveMusicVolume);
+      _musicPlayerVolume = _effectiveMusicVolume;
+      _musicPlayer?.setVolume(_musicPlayerVolume);
     }
   }
 
@@ -191,6 +193,12 @@ class AudioService {
   /// Play powerup use sound
   Future<void> playPowerupUse() => playSfx(AssetPaths.sfxPowerupUse);
 
+  /// Play wind gust sound
+  Future<void> playWindGust() => playSfx(AssetPaths.sfxWindGust);
+
+  /// Play hazard warning sound
+  Future<void> playHazardWarning() => playSfx(AssetPaths.sfxHazardWarning);
+
   // ============ Music Methods ============
 
   /// Play background music
@@ -201,7 +209,8 @@ class AudioService {
       await _musicPlayer?.stop();
       _currentMusic = assetPath;
       await _musicPlayer?.setReleaseMode(ReleaseMode.loop);
-      await _musicPlayer?.setVolume(_effectiveMusicVolume);
+      _musicPlayerVolume = _effectiveMusicVolume;
+      await _musicPlayer?.setVolume(_musicPlayerVolume);
       // Pass audio context with no focus to prevent SFX from stopping music
       await _musicPlayer?.play(
         AssetSource(assetPath.replaceFirst('assets/', '')),
@@ -230,15 +239,42 @@ class AudioService {
     _currentMusic = null;
   }
 
-  /// Pause music
-  Future<void> pauseMusic() async {
+  /// Pause music (optional fade)
+  Future<void> pauseMusic({bool fade = true}) async {
+    if (_musicPlayer == null) return;
+
+    if (fade) {
+      await _fadeMusic(to: 0.0, durationMs: 300);
+    }
     await _musicPlayer?.pause();
   }
 
-  /// Resume music
-  Future<void> resumeMusic() async {
-    if (_musicEnabled && _currentMusic != null) {
-      await _musicPlayer?.resume();
+  /// Resume music (optional fade)
+  Future<void> resumeMusic({bool fade = true}) async {
+    if (!_musicEnabled || _currentMusic == null || _musicPlayer == null) {
+      return;
+    }
+
+    await _musicPlayer?.resume();
+    if (fade) {
+      await _fadeMusic(to: _effectiveMusicVolume, durationMs: 300);
+    }
+  }
+
+  Future<void> _fadeMusic({required double to, int durationMs = 300}) async {
+    final player = _musicPlayer;
+    if (player == null) return;
+
+    final from = _musicPlayerVolume;
+    final steps = 10;
+    final stepDuration = (durationMs / steps).round();
+
+    for (int i = 1; i <= steps; i++) {
+      final t = i / steps;
+      final volume = from + (to - from) * t;
+      _musicPlayerVolume = volume;
+      await player.setVolume(_musicPlayerVolume);
+      await Future.delayed(Duration(milliseconds: stepDuration));
     }
   }
 

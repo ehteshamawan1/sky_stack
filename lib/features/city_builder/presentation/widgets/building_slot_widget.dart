@@ -29,18 +29,18 @@ class BuildingSlotWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: slot.isBuilt
               ? Colors.white
-              : Colors.white.withOpacity(0.3),
+              : Colors.white.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: slot.isBuilt
-                ? AppColors.secondary.withOpacity(0.5)
-                : Colors.white.withOpacity(0.3),
+                ? AppColors.secondary.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.3),
             width: 2,
           ),
           boxShadow: slot.isBuilt
               ? [
                   BoxShadow(
-                    color: AppColors.secondary.withOpacity(0.2),
+                    color: AppColors.secondary.withValues(alpha: 0.2),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -59,12 +59,12 @@ class BuildingSlotWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.add_rounded,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             size: 32,
           ),
         ),
@@ -73,7 +73,7 @@ class BuildingSlotWidget extends StatelessWidget {
           'TAP TO\nBUILD',
           textAlign: TextAlign.center,
           style: AppTextStyles.hudLabel.copyWith(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 10,
             height: 1.2,
           ),
@@ -176,7 +176,7 @@ class BuildingSlotWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: buildingColor.withOpacity(0.15),
+        color: buildingColor.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
       child: Icon(

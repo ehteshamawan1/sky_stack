@@ -8,8 +8,14 @@ import 'components/background_component.dart';
 import 'components/umbrella_person_component.dart';
 import 'components/particle_effects.dart';
 import 'components/score_popup_component.dart';
+import 'components/powerup_pickup_component.dart';
 import 'systems/scoring_system.dart';
 import 'systems/combo_system.dart';
+import 'systems/powerup_system.dart';
+import 'systems/hazard_system.dart';
+import '../data/models/powerup_model.dart';
+import '../data/models/hazard_model.dart';
+import '../data/models/game_mode.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -32,6 +38,9 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   // Systems
   late ScoringSystem scoringSystem;
   late ComboSystem comboSystem;
+  late PowerUpSystem powerUpSystem;
+  late HazardSystem hazardSystem;
+  PowerUpPickupComponent? _activePowerUpPickup;
 
   // Random for umbrella people spawning
   final Random _random = Random();
@@ -47,6 +56,11 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   Function()? onBlockDrop;
   Function(int quality)? onBlockLand; // 0=bad, 1=good, 2=perfect
   Function()? onBlockFall;
+  Function(PowerUpType)? onPowerUpCollected;
+  Function(PowerUpType)? onPowerUpActivated;
+  Function(PowerUpType?, double)? onPowerUpStatus;
+  Function(HazardType?, double)? onHazardStatus;
+  Function(HazardType?, double)? onHazardWarning;
 
   // Block color index for variety
   int _colorIndex = 0;
@@ -55,6 +69,11 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   double _shakeIntensity = 0;
   double _shakeDuration = 0;
   Vector2 _shakeOffset = Vector2.zero();
+
+  // Topple check timing to avoid false positives right after landing
+  double _toppleCheckDelay = 0;
+  static const double _toppleDelaySeconds = 0.5;
+  double _statusTick = 0;
 
   // Current theme
   String currentTheme = 'city';
@@ -66,6 +85,8 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     // Initialize systems
     scoringSystem = ScoringSystem();
     comboSystem = ComboSystem();
+    powerUpSystem = PowerUpSystem();
+    hazardSystem = HazardSystem();
 
     // Add background with current theme
     background = BackgroundComponent(theme: currentTheme);
@@ -129,25 +150,37 @@ class SkyStackGame extends FlameGame with TapCallbacks {
 
   @override
   void update(double dt) {
-    super.update(dt);
+    final cappedDt = dt.clamp(0.0, 1.0 / 30);
+    super.update(cappedDt);
 
     // Update screen shake
-    _updateScreenShake(dt);
+    _updateScreenShake(cappedDt);
 
     if (gameState != GameState.playing) return;
 
+    powerUpSystem.update(cappedDt);
+    hazardSystem.update(cappedDt);
+    tower.setStabilizerMultiplier(powerUpSystem.getWobbleMultiplier());
+    crane.setSpeedMultiplier(
+      powerUpSystem.getSwingSpeedMultiplier() * hazardSystem.getCraneSpeedMultiplier(),
+    );
+
     // Check for block collision with tower while falling
     if (currentBlock != null && currentBlock!.state == BlockState.falling) {
+      _applyWindForce(currentBlock!, cappedDt);
+      _checkPowerUpPickup(currentBlock!);
       final (shouldLand, targetY) = tower.checkCollision(currentBlock!);
       if (shouldLand) {
         currentBlock!.land(targetY);
       }
     }
 
-    // Check if tower has toppled
-    if (tower.hasToppled()) {
-      gameState = GameState.gameOver;
-      onGameOver?.call();
+    _updateStatusCallbacks(cappedDt);
+
+    if (_toppleCheckDelay > 0) {
+      _toppleCheckDelay -= cappedDt;
+    } else if (tower.hasToppled()) {
+      _triggerGameOver('Tower toppled');
     }
   }
 
@@ -178,11 +211,30 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   void handleBlockLanded(BlockComponent block, double blockX) {
     // Calculate offset from where the block should have landed (center of top block or base)
     final targetX = tower.topBlockCenterX;
-    final offset = blockX - targetX;
-    final absOffset = offset.abs();
+    double offset = blockX - targetX;
+    double absOffset = offset.abs();
 
     // First block always lands on the base - no combo possible
     final isFirstBlock = tower.blocks.isEmpty;
+
+    if (!isFirstBlock) {
+      final topBlock = tower.blocks.last;
+      final overlapPercent = _calculateOverlapPercent(block, topBlock);
+      if (overlapPercent < AppConstants.minOverlapPercent) {
+        onBlockFall?.call();
+        block.removeFromParent();
+        currentBlock = null;
+        _triggerGameOver('Insufficient overlap (${(overlapPercent * 100).toStringAsFixed(1)}%)');
+        return;
+      }
+    }
+
+    final magnetRange = powerUpSystem.getMagnetSnapRange();
+    if (magnetRange > 0 && absOffset <= magnetRange) {
+      block.position.x = targetX;
+      offset = 0;
+      absOffset = 0;
+    }
 
     PlacementQuality quality;
     bool isPerfect = absOffset <= AppConstants.perfectThreshold;
@@ -238,6 +290,7 @@ class SkyStackGame extends FlameGame with TapCallbacks {
 
     // Add block to tower with its placement offset
     tower.addBlock(block, offset);
+    _toppleCheckDelay = _toppleDelaySeconds;
     blocksPlaced++;
     onBlocksUpdate?.call(blocksPlaced);
 
@@ -250,6 +303,9 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     // Spawn next block
     currentBlock = null;
     spawnBlock();
+
+    _maybeSpawnPowerUpPickup();
+    _maybeScheduleHazard();
   }
 
   /// Spawn umbrella people floating down to the building
@@ -320,8 +376,7 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     onBlockFall?.call();
 
     currentBlock = null;
-    gameState = GameState.gameOver;
-    onGameOver?.call();
+    _triggerGameOver('Block fell off screen');
   }
 
   void reset() {
@@ -331,10 +386,16 @@ class SkyStackGame extends FlameGame with TapCallbacks {
     population = 0;
     _colorIndex = 0;
     gameState = GameState.ready;
+    _toppleCheckDelay = 0;
+    _statusTick = 0;
 
     tower.clear();
     currentBlock?.removeFromParent();
     currentBlock = null;
+    _activePowerUpPickup?.removeFromParent();
+    _activePowerUpPickup = null;
+    powerUpSystem.clear();
+    hazardSystem.clear();
 
     // Remove any floating umbrella people
     children.whereType<UmbrellaPersonComponent>().toList().forEach((p) => p.removeFromParent());
@@ -382,5 +443,104 @@ class SkyStackGame extends FlameGame with TapCallbacks {
   void updateParallax() {
     final towerHeight = tower.blocks.length * AppConstants.blockHeight;
     background.updateScroll(towerHeight);
+  }
+
+  double _calculateOverlapPercent(BlockComponent block, BlockComponent topBlock) {
+    final blockLeft = block.position.x - block.initialWidth / 2;
+    final blockRight = block.position.x + block.initialWidth / 2;
+    final topLeft = topBlock.position.x - topBlock.initialWidth / 2;
+    final topRight = topBlock.position.x + topBlock.initialWidth / 2;
+
+    final overlapLeft = max(blockLeft, topLeft);
+    final overlapRight = min(blockRight, topRight);
+    final overlapWidth = max(0.0, overlapRight - overlapLeft);
+
+    return overlapWidth / block.initialWidth;
+  }
+
+  void _triggerGameOver(String reason) {
+    if (gameState == GameState.gameOver) return;
+    gameState = GameState.gameOver;
+    onGameOver?.call();
+  }
+
+  void _maybeSpawnPowerUpPickup() {
+    if (!ClassicModeConfig.enablePowerUps) return;
+    if (powerUpSystem.hasActivePowerUp || _activePowerUpPickup != null) return;
+    if (_random.nextDouble() > 0.12) return;
+
+    final types = PowerUpDefinition.launch.keys.toList();
+    if (types.isEmpty) return;
+    final type = types[_random.nextInt(types.length)];
+
+    final baseY = tower.blocks.isEmpty
+        ? size.y - AppConstants.baseY - 140
+        : tower.topY - 140;
+    final spawnX = (tower.topBlockCenterX + (_random.nextDouble() - 0.5) * 140)
+        .clamp(40.0, size.x - 40.0)
+        .toDouble();
+    final spawnY = baseY
+        .clamp(AppConstants.craneHeight + 60.0, size.y - 200.0)
+        .toDouble();
+
+    _activePowerUpPickup = PowerUpPickupComponent(
+      type: type,
+      position: Vector2(spawnX, spawnY),
+      onCollected: _activatePowerUp,
+    );
+    add(_activePowerUpPickup!);
+  }
+
+  void _checkPowerUpPickup(BlockComponent block) {
+    if (_activePowerUpPickup == null) return;
+    if (_activePowerUpPickup!.isRemoved) {
+      _activePowerUpPickup = null;
+      return;
+    }
+
+    if (_activePowerUpPickup!.isCollidingWith(block.position)) {
+      final pickup = _activePowerUpPickup!;
+      _activePowerUpPickup = null;
+      pickup.collect();
+    }
+  }
+
+  void _activatePowerUp(PowerUpType type) {
+    final definition = PowerUpDefinition.launch[type]!;
+    powerUpSystem.activate(type, definition.durationSeconds);
+    onPowerUpCollected?.call(type);
+    onPowerUpActivated?.call(type);
+  }
+
+  void _maybeScheduleHazard() {
+    if (!ClassicModeConfig.enableHazards) return;
+    if (hazardSystem.hasActiveHazard || hazardSystem.hasWarning) return;
+
+    final hazardType = hazardSystem.rollForHazard(blocksPlaced);
+    if (hazardType != null) {
+      hazardSystem.scheduleWarning(hazardType);
+    }
+  }
+
+  void _applyWindForce(BlockComponent block, double dt) {
+    final windForce = hazardSystem.getWindForce();
+    if (windForce == 0) return;
+    block.position.x += windForce * dt;
+  }
+
+  void _updateStatusCallbacks(double dt) {
+    _statusTick += dt;
+    if (_statusTick < 0.1) return;
+    _statusTick = 0;
+
+    final activePowerUp = powerUpSystem.activePowerUp;
+    final powerUpRemaining = activePowerUp != null
+        ? powerUpSystem.remainingSeconds(activePowerUp)
+        : 0;
+    onPowerUpStatus?.call(activePowerUp, powerUpRemaining);
+
+    final activeHazard = hazardSystem.activeHazard;
+    onHazardStatus?.call(activeHazard, hazardSystem.activeRemaining);
+    onHazardWarning?.call(hazardSystem.pendingHazard, hazardSystem.warningRemaining);
   }
 }

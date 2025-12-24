@@ -9,7 +9,7 @@ enum TimeOfDay { day, sunset, night }
 /// Parallax background with 4 layers that move at different speeds
 class BackgroundComponent extends PositionComponent with HasGameReference {
   String _theme;
-  TimeOfDay _timeOfDay = TimeOfDay.day;
+  TimeOfDay timeOfDay = TimeOfDay.day;
 
   // Parallax layers (back to front)
   Svg? _skyLayer;
@@ -33,12 +33,10 @@ class BackgroundComponent extends PositionComponent with HasGameReference {
   static const double _midSpeed = 0.3;
   static const double _nearSpeed = 0.6;
 
-  BackgroundComponent({String theme = 'city', TimeOfDay timeOfDay = TimeOfDay.day})
-      : _theme = theme,
-        _timeOfDay = timeOfDay;
+  BackgroundComponent({String theme = 'city', this.timeOfDay = TimeOfDay.day})
+      : _theme = theme;
 
   String get theme => _theme;
-  TimeOfDay get timeOfDay => _timeOfDay;
 
   set theme(String newTheme) {
     if (_theme != newTheme) {
@@ -47,9 +45,6 @@ class BackgroundComponent extends PositionComponent with HasGameReference {
     }
   }
 
-  set timeOfDay(TimeOfDay newTimeOfDay) {
-    _timeOfDay = newTimeOfDay;
-  }
 
   @override
   Future<void> onLoad() async {
@@ -127,7 +122,7 @@ class BackgroundComponent extends PositionComponent with HasGameReference {
     Color overlayColor;
     double opacity;
 
-    switch (_timeOfDay) {
+    switch (timeOfDay) {
       case TimeOfDay.day:
         return;
       case TimeOfDay.sunset:
@@ -141,12 +136,12 @@ class BackgroundComponent extends PositionComponent with HasGameReference {
     }
 
     final overlayPaint = Paint()
-      ..color = overlayColor.withOpacity(opacity)
+      ..color = overlayColor.withValues(alpha: opacity)
       ..blendMode = BlendMode.multiply;
 
     canvas.drawRect(Rect.fromLTWH(0, 0, width, height), overlayPaint);
 
-    if (_timeOfDay == TimeOfDay.night && _theme != 'space') {
+    if (timeOfDay == TimeOfDay.night && _theme != 'space') {
       _renderNightStars(canvas, width, height);
     }
   }
@@ -161,16 +156,21 @@ class BackgroundComponent extends PositionComponent with HasGameReference {
       final radius = 0.5 + (i % 3) * 0.5;
       final alpha = 0.4 + (i % 5) * 0.12;
 
-      starPaint.color = Colors.white.withOpacity(alpha);
+      starPaint.color = Colors.white.withValues(alpha: alpha);
       canvas.drawCircle(Offset(x, y), radius, starPaint);
     }
   }
 
   void _renderLayer(Canvas canvas, Svg svg, double speed, double scale,
       double screenWidth, double screenHeight) {
+    final yOffset = _scrollOffset * speed;
+    final layerHeight = 800 * scale;
+    if (yOffset > screenHeight || (yOffset + layerHeight) < 0) {
+      return;
+    }
+
     canvas.save();
 
-    final yOffset = _scrollOffset * speed;
     final scaledWidth = 400 * scale;
     final xOffset = (screenWidth - scaledWidth) / 2;
 
@@ -225,7 +225,7 @@ class BackgroundComponent extends PositionComponent with HasGameReference {
       final radius = 0.5 + (i % 3) * 0.5;
       final alpha = 0.3 + (i % 5) * 0.15;
 
-      starPaint.color = Colors.white.withOpacity(alpha);
+      starPaint.color = Colors.white.withValues(alpha: alpha);
       canvas.drawCircle(Offset(x, y), radius, starPaint);
     }
   }

@@ -70,8 +70,15 @@ class BlockComponent extends PositionComponent with HasGameReference {
 
       // Highlight on top
       final highlightRect = Rect.fromLTWH(0, 0, initialWidth, initialHeight * 0.2);
-      canvas.drawRect(highlightRect, Paint()..color = Colors.white.withOpacity(0.3));
+      canvas.drawRect(highlightRect, Paint()..color = Colors.white.withValues(alpha: 0.3));
     }
+  }
+
+  @override
+  void onRemove() {
+    _blockSvg = null;
+    _svgLoaded = false;
+    super.onRemove();
   }
 
   void attachToCrane(CraneComponent crane) {

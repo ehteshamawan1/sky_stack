@@ -87,7 +87,7 @@ class CityProgressBar extends StatelessWidget {
               Text(
                 'City Progress',
                 style: AppTextStyles.hudLabel.copyWith(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
               Text(
@@ -103,7 +103,7 @@ class CityProgressBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withOpacity(0.2),
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
               valueColor: AlwaysStoppedAnimation<Color>(
                 progress >= 1.0 ? AppColors.perfect : AppColors.secondary,
               ),

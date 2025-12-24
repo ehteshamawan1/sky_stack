@@ -8,6 +8,7 @@ class WobbleBehavior extends Component {
   final List<PositionComponent> blocks;
   double wobbleIntensity = 0;
   double wobblePhase = 0;
+  double wobbleMultiplier = 1.0;
 
   // Only wobble top N blocks for performance
   static const int maxWobbleBlocks = 8;
@@ -45,7 +46,7 @@ class WobbleBehavior extends Component {
       // Higher blocks wobble more
       final relativeIndex = i - startIndex;
       final heightMultiplier = (relativeIndex + 1) / wobbleBlockCount;
-      final angle = sin(wobblePhase) * wobbleIntensity * heightMultiplier;
+      final angle = sin(wobblePhase) * (wobbleIntensity * wobbleMultiplier) * heightMultiplier;
       block.angle = angle * (pi / 180);
     }
 

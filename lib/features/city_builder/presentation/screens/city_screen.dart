@@ -88,7 +88,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -115,7 +115,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
                 Text(
                   'Tap a slot to build!',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -131,7 +131,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -163,7 +163,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.perfect.withOpacity(0.4),
+                    color: AppColors.perfect.withValues(alpha: 0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -185,7 +185,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
             Text(
               '$buildingsCount / $totalSlots buildings complete',
               style: AppTextStyles.bodyMedium.copyWith(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
         ],
@@ -245,7 +245,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.refresh_rounded, color: AppColors.primary),
@@ -274,7 +274,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.bad.withOpacity(0.1),
+                  color: AppColors.bad.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.delete_outline_rounded, color: AppColors.bad),
@@ -358,7 +358,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.edit_rounded, color: AppColors.primary),
@@ -381,7 +381,7 @@ class _CityScreenState extends ConsumerState<CityScreen> {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.bad.withOpacity(0.1),
+                  color: AppColors.bad.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.restart_alt_rounded, color: AppColors.bad),

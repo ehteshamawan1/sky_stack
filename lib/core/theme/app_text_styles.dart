@@ -11,7 +11,7 @@ class AppTextStyles {
         letterSpacing: 2,
         shadows: [
           Shadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             offset: const Offset(2, 2),
             blurRadius: 4,
           ),
@@ -49,7 +49,7 @@ class AppTextStyles {
         color: AppColors.perfect,
         shadows: [
           Shadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             offset: const Offset(2, 2),
             blurRadius: 4,
           ),

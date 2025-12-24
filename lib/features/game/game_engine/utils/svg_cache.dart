@@ -8,11 +8,15 @@ class SvgCache {
 
   final Map<String, Svg> _cache = {};
   final Map<String, Future<Svg>> _loading = {};
+  final Map<String, int> _lastAccess = {};
+  int _accessCounter = 0;
+  static const int _maxCacheSize = 32;
 
   /// Get SVG from cache or load it
   Future<Svg?> get(String path) async {
     // Return from cache if available
     if (_cache.containsKey(path)) {
+      _touch(path);
       return _cache[path];
     }
 
@@ -27,6 +31,8 @@ class SvgCache {
       _loading[path] = future;
       final svg = await future;
       _cache[path] = svg;
+      _touch(path);
+      _enforceLimit();
       _loading.remove(path);
       return svg;
     } catch (e) {
@@ -51,5 +57,26 @@ class SvgCache {
   void clear() {
     _cache.clear();
     _loading.clear();
+    _lastAccess.clear();
+    _accessCounter = 0;
+  }
+
+  void _touch(String path) {
+    _accessCounter++;
+    _lastAccess[path] = _accessCounter;
+  }
+
+  void _enforceLimit() {
+    if (_cache.length <= _maxCacheSize) return;
+
+    final entries = _lastAccess.entries.toList()
+      ..sort((a, b) => a.value.compareTo(b.value));
+    final toRemove = _cache.length - _maxCacheSize;
+
+    for (int i = 0; i < toRemove && i < entries.length; i++) {
+      final key = entries[i].key;
+      _cache.remove(key);
+      _lastAccess.remove(key);
+    }
   }
 }

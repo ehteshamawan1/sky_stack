@@ -56,7 +56,7 @@ class ParticleEffects {
             position: position + Vector2(offsetX, 0),
             child: CircleParticle(
               radius: 2,
-              paint: Paint()..color = Colors.grey.withOpacity(0.5),
+              paint: Paint()..color = Colors.grey.withValues(alpha: 0.5),
             ),
           );
         },

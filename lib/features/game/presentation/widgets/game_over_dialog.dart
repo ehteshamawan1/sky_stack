@@ -34,7 +34,7 @@ class GameOverDialog extends StatelessWidget {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       child: Container(
-        color: Colors.black.withOpacity(0.4),
+        color: Colors.black.withValues(alpha: 0.4),
         child: Center(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 32),
@@ -43,14 +43,14 @@ class GameOverDialog extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withOpacity(0.95),
-                  Colors.white.withOpacity(0.9),
+                  Colors.white.withValues(alpha: 0.95),
+                  Colors.white.withValues(alpha: 0.9),
                 ],
               ),
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 30,
                   spreadRadius: 5,
                   offset: const Offset(0, 10),
@@ -78,7 +78,7 @@ class GameOverDialog extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -100,7 +100,7 @@ class GameOverDialog extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -149,7 +149,7 @@ class GameOverDialog extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.textDark.withOpacity(0.05),
+                          color: AppColors.textDark.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Row(
@@ -164,7 +164,7 @@ class GameOverDialog extends StatelessWidget {
                             Container(
                               width: 1,
                               height: 40,
-                              color: AppColors.textDark.withOpacity(0.1),
+                              color: AppColors.textDark.withValues(alpha: 0.1),
                             ),
                             _StatItem(
                               icon: Icons.people_rounded,
@@ -176,7 +176,7 @@ class GameOverDialog extends StatelessWidget {
                               Container(
                                 width: 1,
                                 height: 40,
-                                color: AppColors.textDark.withOpacity(0.1),
+                                color: AppColors.textDark.withValues(alpha: 0.1),
                               ),
                               _StatItem(
                                 icon: Icons.emoji_events_rounded,
@@ -209,7 +209,7 @@ class GameOverDialog extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.perfect.withOpacity(0.4),
+                                        color: AppColors.perfect.withValues(alpha: 0.4),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
                                       ),
@@ -248,7 +248,7 @@ class GameOverDialog extends StatelessWidget {
                                             vertical: 2,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.2),
+                                            color: Colors.white.withValues(alpha: 0.2),
                                             borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: Row(
@@ -294,7 +294,7 @@ class GameOverDialog extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.secondary.withOpacity(0.4),
+                                    color: AppColors.secondary.withValues(alpha: 0.4),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),

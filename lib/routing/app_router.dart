@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
+import '../features/splash/presentation/screens/splash_screen.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/home/presentation/screens/profile_screen.dart';
 import '../features/game/presentation/screens/game_screen.dart';
@@ -9,6 +10,11 @@ import '../features/city_builder/presentation/screens/city_screen.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case Routes.splash:
+        return MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+        );
+
       case Routes.home:
         return MaterialPageRoute(
           builder: (_) => const HomeScreen(),

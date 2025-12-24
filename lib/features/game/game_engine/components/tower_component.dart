@@ -15,6 +15,7 @@ class TowerComponent extends Component with HasGameReference {
   double _swayVelocity = 0; // Angular velocity
   double _baseX = 0; // Base center X position
   double _scrollOffset = 0; // Total amount scrolled up
+  double _swayMultiplier = 1.0;
 
   // Smooth scrolling
   double _targetScrollOffset = 0; // Where we want to scroll to
@@ -153,7 +154,7 @@ class TowerComponent extends Component with HasGameReference {
         // Sway increases for higher blocks within the sway range
         final swayPosition = i - startSwayIndex + 1; // 1 to 5
         final swayFactor = swayPosition / swayBlockCount; // 0.2 to 1.0
-        swayOffset = sin(_swayAngle) * swayFactor * maxSwayPixels; // Max sway in pixels
+        swayOffset = sin(_swayAngle) * swayFactor * maxSwayPixels * _swayMultiplier; // Max sway in pixels
       }
 
       block.position.x = _baseX + swayOffset + _getBlockOffset(i);
@@ -193,7 +194,7 @@ class TowerComponent extends Component with HasGameReference {
       final direction = placementOffset > 0 ? 1.0 : -1.0;
       // More aggressive sway for taller towers
       final heightFactor = 1.0 + (blocks.length * 0.1);
-      _swayVelocity += direction * excessOffset * swayImpactFactor * heightFactor;
+      _swayVelocity += direction * excessOffset * swayImpactFactor * heightFactor * _swayMultiplier;
 
       // Trigger wobble animation
       final wobbleIntensity = (excessOffset / AppConstants.blockWidth) * AppConstants.maxWobbleAngle;
@@ -201,7 +202,7 @@ class TowerComponent extends Component with HasGameReference {
     } else if (absOffset > AppConstants.comboThreshold) {
       // Mediocre placement - some sway
       final direction = placementOffset > 0 ? 1.0 : -1.0;
-      _swayVelocity += direction * absOffset * swayImpactFactor * 0.5;
+      _swayVelocity += direction * absOffset * swayImpactFactor * 0.5 * _swayMultiplier;
 
       // Slight wobble
       final wobbleIntensity = (absOffset / AppConstants.goodThreshold) * 5.0;
@@ -224,7 +225,7 @@ class TowerComponent extends Component with HasGameReference {
     if (blocks.length < 3) return false;
 
     // Calculate the visual displacement of the top block from sway
-    final topBlockSwayOffset = sin(_swayAngle).abs() * maxSwayPixels;
+    final topBlockSwayOffset = sin(_swayAngle).abs() * maxSwayPixels * _swayMultiplier;
 
     // Also consider cumulative offset - if blocks are stacked too far off-center
     final absCumulativeOffset = _cumulativeOffset.abs();
@@ -269,6 +270,8 @@ class TowerComponent extends Component with HasGameReference {
 
     // Reset wobble
     wobbleBehavior.reset();
+    wobbleBehavior.wobbleMultiplier = 1.0;
+    _swayMultiplier = 1.0;
 
     // Reset base position (full width platform)
     _baseX = game.size.x / 2;
@@ -277,6 +280,11 @@ class TowerComponent extends Component with HasGameReference {
 
     // Reset last game size to force update on next frame
     _lastGameSize = game.size.clone();
+  }
+
+  void setStabilizerMultiplier(double multiplier) {
+    _swayMultiplier = multiplier.clamp(0.1, 1.0);
+    wobbleBehavior.wobbleMultiplier = _swayMultiplier;
   }
 
   /// Check if a falling block should land on the tower

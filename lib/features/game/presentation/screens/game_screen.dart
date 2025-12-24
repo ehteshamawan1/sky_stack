@@ -8,6 +8,8 @@ import '../../../../core/services/haptic_service.dart';
 import '../../../../core/providers/player_data_provider.dart';
 import '../../../city_builder/providers/city_provider.dart';
 import '../../data/models/game_mode.dart';
+import '../../data/models/powerup_model.dart';
+import '../../data/models/hazard_model.dart';
 import '../../game_engine/sky_stack_game.dart';
 import '../../providers/theme_provider.dart';
 import '../widgets/game_hud.dart';
@@ -28,7 +30,7 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen> with WidgetsBindingObserver {
   late SkyStackGame game;
   String? _currentTheme;
   int currentScore = 0;
@@ -44,6 +46,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   int continuesUsed = 0;
   bool isAdLoading = false;
   DateTime? _gameStartTime;
+  bool _lifecyclePaused = false;
+  PowerUpType? _activePowerUp;
+  double _powerUpRemaining = 0;
+  HazardType? _activeHazard;
+  double _hazardRemaining = 0;
+  HazardType? _warningHazard;
+  double _warningRemaining = 0;
+  HazardType? _lastHazardSound;
+  HazardType? _lastWarningSound;
 
   // Flag to track if waiting for first tap to start
   bool _isWaitingForFirstTap = true;
@@ -59,6 +70,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadHighScore();
     _initAdService();
     _initAudioSettings();
@@ -72,7 +84,42 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   void dispose() {
     // Stop game music when leaving
     _audioService.stopMusic();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_currentTheme == null) {
+      if (state == AppLifecycleState.detached) {
+        _audioService.dispose();
+      }
+      return;
+    }
+
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+        _lifecyclePaused = true;
+        _audioService.pauseMusic();
+        game.pauseEngine();
+        break;
+      case AppLifecycleState.inactive:
+        _audioService.pauseMusic();
+        game.pauseEngine();
+        _lifecyclePaused = true;
+        break;
+      case AppLifecycleState.resumed:
+        if (_lifecyclePaused && !isPaused && !isGameOver) {
+          _lifecyclePaused = false;
+          game.resumeEngine();
+          _audioService.resumeMusic();
+        }
+        break;
+      case AppLifecycleState.detached:
+        _audioService.dispose();
+        break;
+    }
   }
 
   void _initAudioSettings() {
@@ -176,6 +223,45 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ..onBlockFall = () {
         _audioService.playBlockFall();
         _hapticService.blockFall();
+      }
+      ..onPowerUpCollected = (type) {
+        _audioService.playPowerupPickup();
+        _hapticService.lightTap();
+      }
+      ..onPowerUpActivated = (type) {
+        _audioService.playPowerupUse();
+      }
+      ..onPowerUpStatus = (type, remaining) {
+        _safeSetState(() {
+          _activePowerUp = type;
+          _powerUpRemaining = remaining;
+        });
+      }
+      ..onHazardStatus = (type, remaining) {
+        if (type == null) {
+          _lastHazardSound = null;
+        } else if (type != _lastHazardSound) {
+          if (type == HazardType.wind) {
+            _audioService.playWindGust();
+          }
+          _lastHazardSound = type;
+        }
+        _safeSetState(() {
+          _activeHazard = type;
+          _hazardRemaining = remaining;
+        });
+      }
+      ..onHazardWarning = (type, remaining) {
+        if (type == null) {
+          _lastWarningSound = null;
+        } else if (type != _lastWarningSound) {
+          _audioService.playHazardWarning();
+          _lastWarningSound = type;
+        }
+        _safeSetState(() {
+          _warningHazard = type;
+          _warningRemaining = remaining;
+        });
       };
     setState(() {}); // Trigger rebuild with game ready
   }
@@ -283,6 +369,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       perfectDrops = 0;
       continuesUsed = 0;
       _isWaitingForFirstTap = true; // Show tap to start again
+      _activePowerUp = null;
+      _powerUpRemaining = 0;
+      _activeHazard = null;
+      _hazardRemaining = 0;
+      _warningHazard = null;
+      _warningRemaining = 0;
+      _lastHazardSound = null;
+      _lastWarningSound = null;
     });
     game.reset();
   }
@@ -328,6 +422,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       // Resume game engine and restart music even if ad failed
       game.resumeEngine();
       await _audioService.playGameMusic(_currentTheme ?? 'city');
+      if (!mounted) return;
       // Show snackbar that ad failed
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -395,6 +490,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 score: currentScore,
                 combo: currentCombo,
                 population: population,
+                activePowerUp: _activePowerUp,
+                powerUpRemaining: _powerUpRemaining,
+                activeHazard: _activeHazard,
+                hazardRemaining: _hazardRemaining,
+                warningHazard: _warningHazard,
+                warningRemaining: _warningRemaining,
                 onPause: _pauseGame,
               ),
 
@@ -489,7 +590,7 @@ class _TapToStartOverlay extends StatelessWidget {
                       Text(
                         'Build the tallest tower for your city!',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 12,
                         ),
                       ),
@@ -549,7 +650,7 @@ class _PerfectIndicator extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orange.withOpacity(0.5),
+                      color: Colors.orange.withValues(alpha: 0.5),
                       blurRadius: 12,
                       spreadRadius: 2,
                     ),
